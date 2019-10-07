@@ -2,7 +2,6 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <iomanip>
-#include <FreeImage.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc.hpp>
@@ -15,16 +14,16 @@ int t_count = 0;
 int frameNumber = 0;
 
 /* For video */
-#if !WRITE_TO_FILE && RECORD_VIDEO
-std::string str_cmd =
-    "ffmpeg -r " + std::to_string(FPS) + " -f rawvideo -pix_fmt rgba -s " +
-    std::to_string(X_WINDOW) + "x" + std::to_string(Y_WINDOW) +
-    " -i - -threads 0 -preset fast -y -pix_fmt yuv420p -crf 21 -vf vflip "
-    "out/movie.mp4";
-const char *cmd = str_cmd.c_str();
-FILE *ffmpeg = popen(cmd, "wb");
-int *buffer = new int[X_WINDOW * Y_WINDOW];
-#endif
+void images2video() {
+  std::string command =
+      "ffmpeg -r 60 -start_number 0 -i ../result/sim%04d.png -vcodec mpeg4 "
+      "-b 20M -s 600x600 ./result.mp4";
+  system(command.c_str());
+
+  // remove images
+  // command = "rm ./result/*.png";
+  // system(command.c_str());
+}
 
 /* -----------------------------------------------------------------------
 |					MATERIAL POINT METHOD ALGORITHM
@@ -103,12 +102,11 @@ int main(int argc, char **argv) {
     {
       Simulation->Draw();
       glfwSwapBuffers(window);
+
 #if RECORD_VIDEO
-      // glReadPixels(0, 0, X_WINDOW, Y_WINDOW, GL_RGBA, GL_UNSIGNED_BYTE,
-      // buffer); fwrite(buffer, sizeof(int) * X_WINDOW * Y_WINDOW, 1, ffmpeg);
       std::string dir = "../result/sim";
+
       // zero padding
-      // e.g. "output0001.bmp"
       std::string num = std::to_string(frameNumber);
       num = std::string(4 - num.length(), '0') + num;
       std::string output = dir + num + ".png";
@@ -124,25 +122,24 @@ int main(int argc, char **argv) {
       cv::flip(outImg, outImg, 0);
       cv::imwrite(output, outImg);
 
-      // FIBITMAP *outputImage =
-      //     FreeImage_AllocateT(FIT_UINT32, X_WINDOW, Y_WINDOW);
-      // glReadPixels(0, 0, X_WINDOW, Y_WINDOW, GL_BGRA,
-      //              GL_UNSIGNED_INT_8_8_8_8_REV,
-      //              (GLvoid *)FreeImage_GetBits(outputImage));
-      // FreeImage_Save(FIF_PNG, outputImage, output.c_str(),
-      // PNG_DEFAULT);
-      // std::cout << output << " saved." << '\n';
+      std::cout << "Frame " << frameNumber << " saved." << '\n';
+
       frameNumber++;
 #endif
+
       glfwPollEvents();
     }
+
+    // Don't forget to reset grid every frame !!
     Simulation->ResetGrid();
+
     t_count++;
   }
 
 #if RECORD_VIDEO
-  pclose(ffmpeg);
+  images2video();
 #endif
+
   glfwTerminate();
 #endif
 

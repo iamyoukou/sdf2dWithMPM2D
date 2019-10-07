@@ -9,7 +9,7 @@
 
 // Grid
 const static int X_GRID = 300; // Size of the domain
-const static int Y_GRID = 300;
+const static int Y_GRID = 100;
 
 // Transfer
 #define INTERPOLATION 1          // [1] Cubic - [2] Quadratic
