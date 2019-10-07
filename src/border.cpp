@@ -57,10 +57,10 @@ void Border::Friction(Vector2f &Vi_fri, const Vector2f &Vi_col,
 
 void Border::DrawBorder() {
   glLineWidth(4);
-  glColor3f(.3f, 0.3f, 0.3f);
+  glColor3f(.616f, 0.29f, 0.663f);
 
   glBegin(GL_LINES);
-  glVertex2f(X_corner[0][0], X_corner[0][1]);
-  glVertex2f(X_corner[1][0], X_corner[1][1]);
+  glVertex2f(X_corner[0][0], X_corner[0][1]); // start point
+  glVertex2f(X_corner[1][0], X_corner[1][1]); // end point
   glEnd();
 }

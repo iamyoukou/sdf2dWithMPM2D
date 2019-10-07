@@ -1,7 +1,7 @@
 #pragma once
 
 #include "constants.h"
-#include <PoissonGenerator/PoissonGenerator.h>
+#include "PoissonGenerator.h"
 #include <math.h>
 #include <vector>
 #include <GLFW/glfw3.h>

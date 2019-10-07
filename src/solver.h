@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include <FreeImage.h>
 
 /* The solver class is the link between particles and nodes.
 Transfers and updates are executed on solver instances. */

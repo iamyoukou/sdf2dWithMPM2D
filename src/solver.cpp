@@ -10,6 +10,7 @@ Solver::Solver(const std::vector<Border> &inBorders,
 
   blen = borders.size();
   ilen = nodes.size();
+  plen = particles.size();
 }
 
 /* -----------------------------------------------------------------------
@@ -20,7 +21,9 @@ Solver::Solver(const std::vector<Border> &inBorders,
 // Transfer from Particles to Grid nodes
 void Solver::P2G() {
   // plen is computed here for when we add particles mid-simulaion
-  plen = particles.size();
+  // If there is no need to add new particles during simulation,
+  // write this line in constructors
+  // plen = particles.size();
 
 #pragma omp parallel for
   for (int p = 0; p < plen; p++) {
@@ -180,14 +183,15 @@ void Solver::ResetGrid() {
 // Draw particles, border and nodes (if selected).
 void Solver::Draw() {
   // Draw borders
-  for (size_t b = 0; b < blen; b++)
+  for (size_t b = 0; b < blen; b++) {
     borders[b].DrawBorder();
+  }
 
-// Draw nodes
-#if DRAW_NODES
-  for (size_t i = 0; i < ilen; i++)
-    nodes[i].DrawNode();
-#endif
+  // Draw nodes
+  // #if DRAW_NODES
+  //   for (size_t i = 0; i < ilen; i++)
+  //     nodes[i].DrawNode();
+  // #endif
 
   // Draw particles
   for (size_t p = 0; p < plen; p++)
@@ -195,27 +199,27 @@ void Solver::Draw() {
 }
 
 // Write particle position to .ply file (used in Houdini for ex)
-void Solver::WriteToFile(int frame) {
-  std::ofstream output;
-  std::string fileName = "out/ply/frame_" + std::to_string(frame) + ".ply";
-
-  output.open(fileName);
-  output << "ply" << std::endl;
-  output << "format ascii 1.0" << std::endl;
-  output << "element vertex " << particles.size() << std::endl;
-  output << "property float x" << std::endl;
-  output << "property float y" << std::endl;
-  output << "property float z" << std::endl;
-  output << "element face 0" << std::endl;
-  output << "property list uint int vertex_indices" << std::endl;
-  output << "end_header" << std::endl;
-
-  for (int p = 0; p < plen; p++) {
-    std::string coordinates = std::to_string(particles[p].Xp[0]) + " " +
-                              std::to_string(particles[p].Xp[1]) + " " + "0";
-    output << coordinates << std::endl;
-  }
-
-  output.close();
-  std::cout << " Frame #: " << frame << std::endl;
-}
+// void Solver::WriteToFile(int frame) {
+//   std::ofstream output;
+//   std::string fileName = "out/ply/frame_" + std::to_string(frame) + ".ply";
+//
+//   output.open(fileName);
+//   output << "ply" << std::endl;
+//   output << "format ascii 1.0" << std::endl;
+//   output << "element vertex " << particles.size() << std::endl;
+//   output << "property float x" << std::endl;
+//   output << "property float y" << std::endl;
+//   output << "property float z" << std::endl;
+//   output << "element face 0" << std::endl;
+//   output << "property list uint int vertex_indices" << std::endl;
+//   output << "end_header" << std::endl;
+//
+//   for (int p = 0; p < plen; p++) {
+//     std::string coordinates = std::to_string(particles[p].Xp[0]) + " " +
+//                               std::to_string(particles[p].Xp[1]) + " " + "0";
+//     output << coordinates << std::endl;
+//   }
+//
+//   output.close();
+//   std::cout << " Frame #: " << frame << std::endl;
+// }

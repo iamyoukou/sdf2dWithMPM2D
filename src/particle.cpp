@@ -318,6 +318,8 @@ void Snow::DrawParticle() {
   glBegin(GL_POINTS);
   glVertex2f(Xp[0], Xp[1]);
   glEnd();
+
+  // std::cout << Xp[0] << ", " << Xp[1] << '\n';
 }
 
 //

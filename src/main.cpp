@@ -37,18 +37,25 @@ void Initialization() {
 }
 
 void Update() {
-  Simulation->P2G();             // Transfer data from Particles to Grid Nodes
-  Simulation->UpdateNodes();     // Update nodes data
-  Simulation->G2P();             // Transfer data from Grid Nodes to Particles
-  Simulation->UpdateParticles(); // Update particles data
+  Simulation->P2G();         // Transfer data from Particles to Grid Nodes
+  Simulation->UpdateNodes(); // Update nodes data
+  Simulation->G2P();         // Transfer data from Grid Nodes to Particles
+
+  // BUG: Something wrong in this method.
+  // Simulation->UpdateParticles(); // Update particles data
 }
 
-void AddParticles() // Add particle during the simulation
-{
+// Add particle during the simulation
+// If new particles are needed during simulation, use this method,
+// and modify the AddParticles() method in particle.h
+void AddParticles() {
   // DT_ROB gives the rate of insertion. Maximum number of particles
   if (t_count % DT_ROB == 0 && Simulation->particles.size() < 3000) {
+    // Create particles
     std::vector<Material> new_p = Material::AddParticles();
-    for (size_t p = 0, plen = new_p.size(); p < plen; p++)
+
+    // Add particles to solver
+    for (size_t p = 0; p < new_p.size(); p++)
       Simulation->particles.push_back(new_p[p]);
   }
 }
@@ -82,32 +89,38 @@ int main(int argc, char **argv) {
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    AddParticles();
-    Update();
+    // If new particles are needed during simulation,
+    // activate this method
+    // AddParticles();
+
+    // P2G, compute grid forces, etc.
+    Update(); // BUG
 
     if (t_count % (int)(DT_render / DT) == 0) // Display frame at desired rate
     {
       Simulation->Draw();
       glfwSwapBuffers(window);
-#if RECORD_VIDEO
-      // glReadPixels(0, 0, X_WINDOW, Y_WINDOW, GL_RGBA, GL_UNSIGNED_BYTE,
-      // buffer); fwrite(buffer, sizeof(int) * X_WINDOW * Y_WINDOW, 1, ffmpeg);
-      std::string dir = "../result/sim";
-      // zero padding
-      // e.g. "output0001.bmp"
-      std::string num = std::to_string(frameNumber);
-      num = std::string(4 - num.length(), '0') + num;
-      std::string output = dir + num + ".bmp";
-
-      FIBITMAP *outputImage =
-          FreeImage_AllocateT(FIT_UINT32, X_WINDOW * 2, Y_WINDOW * 2);
-      glReadPixels(0, 0, X_WINDOW * 2, Y_WINDOW * 2, GL_BGRA,
-                   GL_UNSIGNED_INT_8_8_8_8_REV,
-                   (GLvoid *)FreeImage_GetBits(outputImage));
-      FreeImage_Save(FIF_BMP, outputImage, output.c_str(), 0);
-      // std::cout << output << " saved." << '\n';
-      frameNumber++;
-#endif
+      // #if RECORD_VIDEO
+      //       // glReadPixels(0, 0, X_WINDOW, Y_WINDOW, GL_RGBA,
+      //       GL_UNSIGNED_BYTE,
+      //       // buffer); fwrite(buffer, sizeof(int) * X_WINDOW * Y_WINDOW, 1,
+      //       ffmpeg); std::string dir = "../result/sim";
+      //       // zero padding
+      //       // e.g. "output0001.bmp"
+      //       std::string num = std::to_string(frameNumber);
+      //       num = std::string(4 - num.length(), '0') + num;
+      //       std::string output = dir + num + ".png";
+      //
+      //       FIBITMAP *outputImage =
+      //           FreeImage_AllocateT(FIT_UINT32, X_WINDOW, Y_WINDOW);
+      //       glReadPixels(0, 0, X_WINDOW, Y_WINDOW, GL_BGRA,
+      //                    GL_UNSIGNED_INT_8_8_8_8_REV,
+      //                    (GLvoid *)FreeImage_GetBits(outputImage));
+      //       FreeImage_Save(FIF_PNG, outputImage, output.c_str(),
+      //       PNG_DEFAULT);
+      //       // std::cout << output << " saved." << '\n';
+      //       frameNumber++;
+      // #endif
       glfwPollEvents();
     }
     Simulation->ResetGrid();
@@ -129,6 +142,7 @@ int main(int argc, char **argv) {
 ----------------------------------------------------------------------- */
 
 /* Define window. */
+// Set parameters for window
 GLFWwindow *initGLFWContext() {
   if (!glfwInit())
     exit(EXIT_FAILURE);
@@ -143,10 +157,12 @@ GLFWwindow *initGLFWContext() {
   }
 
   glfwMakeContextCurrent(window);
+
   return window;
 }
 
 /* Define view parameters */
+// Set parameters for opengl environment
 void initGLContext() {
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
@@ -155,6 +171,6 @@ void initGLContext() {
   glOrtho(0, X_GRID, 0, Y_GRID, -1, 1);                   // original
   glViewport(0, 0, (GLsizei)X_WINDOW, (GLsizei)Y_WINDOW); // transfo
 
-  glClearColor(.4f, .4f, .4f, .0f);
+  glClearColor(.659f, .694f, .82f, .0f);
   glClear(GL_COLOR_BUFFER_BIT);
 }

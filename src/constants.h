@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Algebra/algebra.h>
+#include "algebra.h"
 
 /* -----------------------------------------------------------------------
 |									OPTIONS
@@ -8,8 +8,8 @@
 ----------------------------------------------------------------------- */
 
 // Grid
-const static int X_GRID = 200; // Size of the domain
-const static int Y_GRID = 100;
+const static int X_GRID = 300; // Size of the domain
+const static int Y_GRID = 300;
 
 // Transfer
 #define INTERPOLATION 1          // [1] Cubic - [2] Quadratic
@@ -47,7 +47,9 @@ static const float Dp_scal = 4.0f;
 #endif
 
 /* ----- RENDERING ----- */
-const static int X_WINDOW = 1400; // Window size
+// Window size
+// GOOD: Dynamically decide y-size based on x-size
+const static int X_WINDOW = 600;
 const static int Y_WINDOW = X_WINDOW * Y_GRID / X_GRID;
 
 #if RECORD_VIDEO || WRITE_TO_FILE
