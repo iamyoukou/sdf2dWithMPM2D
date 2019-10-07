@@ -136,9 +136,9 @@ int main(int argc, char **argv) {
     t_count++;
   }
 
-#if RECORD_VIDEO
-  images2video();
-#endif
+  // #if RECORD_VIDEO
+  //   images2video();
+  // #endif
 
   glfwTerminate();
 #endif

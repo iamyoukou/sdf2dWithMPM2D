@@ -5,6 +5,9 @@
 #include <math.h>
 #include <vector>
 #include <GLFW/glfw3.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc.hpp>
 
 /* The particle class contains data commun to all simulation.
 The material subclasses contains particular data and methods. */
@@ -192,18 +195,54 @@ public:
     Matrix2f a = Matrix2f(0);
 
     // get position from image
-    // FIBITMAP *input = FreeImage_Load(FIF_PNG, "heart.png", PNG_DEFAULT);
+    cv::Mat inImg = cv::imread("heart.png");
 
-    for (int p = 0; p < NP; p++) {
-      Vector2f pos = Vector2f(P_c[p].x * R_BALL + X_BALL,
-                              P_c[p].y * R_BALL + Y_GRID - Y_BALL);
-      outParticles.push_back(Snow(VOL, MASS, pos, v, a));
-    }
-    for (int p = 0; p < NP; p++) {
-      Vector2f pos = Vector2f(P_c[p].x * R_BALL + X_GRID - X_BALL,
-                              P_c[p].y * R_BALL + Y_BALL);
-      outParticles.push_back(Snow(VOL, MASS, pos, -v, a));
-    }
+    int rndSize = 100;
+    int imgWidth = inImg.size().width;
+    int imgHeight = inImg.size().height;
+
+    for (int i = 0; i < rndSize; i++) {
+      for (int j = 0; j < rndSize; j++) {
+        int x, y;
+        x = myRand(0, imgWidth - 1);
+        y = myRand(0, imgHeight - 1);
+
+        cv::Vec3b pixelSrc = inImg.at<cv::Vec3b>(cv::Point(x, y));
+
+        int color = pixelSrc[0] + pixelSrc[1] + pixelSrc[2];
+        // some threshold
+        if (color < 10) {
+          Vector2f pos;
+
+          // rescale
+          float fx, fy;
+          fx = (float)x / (float)imgWidth; // to [0, 1.0]
+          fy = (float)y / (float)imgHeight;
+          fx *= 0.75f;
+          fy *= 0.75f;
+
+          // translate
+          fx += 0.125f;
+          fy += 0.3f;
+
+          // back to world space
+          pos = Vector2f(fx * (float)X_GRID, fy * (float)Y_GRID);
+
+          outParticles.push_back(Snow(VOL, MASS, pos, v, a));
+        }
+      } // end inner for
+    }   // end outer for
+
+    // for (int p = 0; p < NP; p++) {
+    //   Vector2f pos = Vector2f(P_c[p].x * R_BALL + X_BALL,
+    //                           P_c[p].y * R_BALL + Y_GRID - Y_BALL);
+    //   outParticles.push_back(Snow(VOL, MASS, pos, v, a));
+    // }
+    // for (int p = 0; p < NP; p++) {
+    //   Vector2f pos = Vector2f(P_c[p].x * R_BALL + X_GRID - X_BALL,
+    //                           P_c[p].y * R_BALL + Y_BALL);
+    //   outParticles.push_back(Snow(VOL, MASS, pos, -v, a));
+    // }
 
     return outParticles;
   }
@@ -212,6 +251,10 @@ public:
   {
     std::vector<Snow> outParticles;
     return outParticles;
+  }
+
+  static int myRand(int down, int up) {
+    return (rand() % (up - down - 1) + down);
   }
 };
 

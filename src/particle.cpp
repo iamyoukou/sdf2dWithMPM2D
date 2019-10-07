@@ -80,8 +80,10 @@ Snow::Snow(const float inVp0, const float inMp, const Vector2f &inXp,
   lam = LAM_snow;
   mu = MU_snow;
 
-  s = ((float)rand() / (RAND_MAX)) * 7;
-  r = 1 - ((float)rand() / (RAND_MAX)) * 0.23f;
+  // s = ((float)rand() / (RAND_MAX)) * 7;
+  // r = 1 - ((float)rand() / (RAND_MAX)) * 0.23f;
+  s = 3.0f;
+  r = 1.0f;
 }
 
 Snow::Snow(Particle p) : Particle(p.Vp0, p.Mp, p.Xp, p.Vp, p.Bp) {
