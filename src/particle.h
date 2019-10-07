@@ -191,6 +191,9 @@ public:
     Vector2f v = Vector2f(40, 0); // Initial velocity
     Matrix2f a = Matrix2f(0);
 
+    // get position from image
+    // FIBITMAP *input = FreeImage_Load(FIF_PNG, "heart.png", PNG_DEFAULT);
+
     for (int p = 0; p < NP; p++) {
       Vector2f pos = Vector2f(P_c[p].x * R_BALL + X_BALL,
                               P_c[p].y * R_BALL + Y_GRID - Y_BALL);

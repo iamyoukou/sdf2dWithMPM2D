@@ -3,6 +3,9 @@
 #include <iostream>
 #include <iomanip>
 #include <FreeImage.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc.hpp>
 
 /* Declarations */
 void initGLContext();
@@ -75,8 +78,8 @@ int main(int argc, char **argv) {
   while (1) {
     AddParticles();
     Update();
-    if (t_count % (int)(DT_render / DT) == 0) // Record frame at desired rate
-      Simulation->WriteToFile(frame_count++);
+    if (t_count % (int)(DT_render / DT) == 0) // Record frame at desired
+      rate Simulation->WriteToFile(frame_count++);
     Simulation->ResetGrid();
     t_count++;
   }
@@ -100,27 +103,37 @@ int main(int argc, char **argv) {
     {
       Simulation->Draw();
       glfwSwapBuffers(window);
-      // #if RECORD_VIDEO
-      //       // glReadPixels(0, 0, X_WINDOW, Y_WINDOW, GL_RGBA,
-      //       GL_UNSIGNED_BYTE,
-      //       // buffer); fwrite(buffer, sizeof(int) * X_WINDOW * Y_WINDOW, 1,
-      //       ffmpeg); std::string dir = "../result/sim";
-      //       // zero padding
-      //       // e.g. "output0001.bmp"
-      //       std::string num = std::to_string(frameNumber);
-      //       num = std::string(4 - num.length(), '0') + num;
-      //       std::string output = dir + num + ".png";
-      //
-      //       FIBITMAP *outputImage =
-      //           FreeImage_AllocateT(FIT_UINT32, X_WINDOW, Y_WINDOW);
-      //       glReadPixels(0, 0, X_WINDOW, Y_WINDOW, GL_BGRA,
-      //                    GL_UNSIGNED_INT_8_8_8_8_REV,
-      //                    (GLvoid *)FreeImage_GetBits(outputImage));
-      //       FreeImage_Save(FIF_PNG, outputImage, output.c_str(),
-      //       PNG_DEFAULT);
-      //       // std::cout << output << " saved." << '\n';
-      //       frameNumber++;
-      // #endif
+#if RECORD_VIDEO
+      // glReadPixels(0, 0, X_WINDOW, Y_WINDOW, GL_RGBA, GL_UNSIGNED_BYTE,
+      // buffer); fwrite(buffer, sizeof(int) * X_WINDOW * Y_WINDOW, 1, ffmpeg);
+      std::string dir = "../result/sim";
+      // zero padding
+      // e.g. "output0001.bmp"
+      std::string num = std::to_string(frameNumber);
+      num = std::string(4 - num.length(), '0') + num;
+      std::string output = dir + num + ".png";
+
+      // use opencv to save a frame
+      // the frame size becomes twice from frame 2,
+      // thus multiplying 2 is needed.
+      // don't know why
+      cv::Mat outImg(Y_WINDOW * 2, X_WINDOW * 2, CV_8UC3);
+      glPixelStorei(GL_PACK_ALIGNMENT, 4);
+      glReadPixels(0, 0, X_WINDOW * 2, Y_WINDOW * 2, GL_BGR, GL_UNSIGNED_BYTE,
+                   (GLvoid *)outImg.data);
+      cv::flip(outImg, outImg, 0);
+      cv::imwrite(output, outImg);
+
+      // FIBITMAP *outputImage =
+      //     FreeImage_AllocateT(FIT_UINT32, X_WINDOW, Y_WINDOW);
+      // glReadPixels(0, 0, X_WINDOW, Y_WINDOW, GL_BGRA,
+      //              GL_UNSIGNED_INT_8_8_8_8_REV,
+      //              (GLvoid *)FreeImage_GetBits(outputImage));
+      // FreeImage_Save(FIF_PNG, outputImage, output.c_str(),
+      // PNG_DEFAULT);
+      // std::cout << output << " saved." << '\n';
+      frameNumber++;
+#endif
       glfwPollEvents();
     }
     Simulation->ResetGrid();
