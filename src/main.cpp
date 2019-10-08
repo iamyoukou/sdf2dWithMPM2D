@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
       Simulation->Draw();
 
       // for testing sdf
-      drawSdf(window);
+      // drawSdf(window);
 
       glfwSwapBuffers(window);
 
@@ -215,12 +215,6 @@ void drawSdf(GLFWwindow *wnd) {
   float dist = Simulation->getDistance(start);
   glm::vec2 grad = Simulation->getGradient(start);
   glm::vec2 end = start + dist * grad;
-
-  // start.x = start.x / (float)X_GRID * (float)X_WINDOW;
-  // start.y = start.y / (float)Y_GRID * (float)Y_WINDOW;
-  //
-  // end.x = end.x / (float)X_GRID * (float)X_WINDOW;
-  // end.y = end.y / (float)Y_GRID * (float)Y_WINDOW;
 
   glLineWidth(4);
   glColor3f(1.f, 0.f, 0.f);

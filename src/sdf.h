@@ -44,7 +44,22 @@ public:
     square.add(glm::vec2(200.5f, 56.f));
     square.computeAabb();
 
+    Polygon object2;
+    object2.add(glm::vec2(29.5f, 87.5f));
+    object2.add(glm::vec2(29.5f, 136.5f));
+    object2.add(glm::vec2(84.5f, 175.f));
+    object2.add(glm::vec2(132.5f, 147.f));
+    object2.computeAabb();
+
+    Polygon object3;
+    object3.add(glm::vec2(207.5f, 118.f));
+    object3.add(glm::vec2(233.f, 186.f));
+    object3.add(glm::vec2(284.5f, 139.f));
+    object3.computeAabb();
+
     polys.push_back(square);
+    polys.push_back(object2);
+    polys.push_back(object3);
 
     return polys;
   }
