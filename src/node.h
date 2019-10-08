@@ -18,6 +18,10 @@ public:
 
   Vector2f Fi; // Force applied to the node
 
+  /* for sdf-based collision detection */
+  float sdfDist;
+  Vector2f sdfGrad;
+
   std::vector<int>
       CollisionObjects; // List of borders on which the node collides
 

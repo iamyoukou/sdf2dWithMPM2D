@@ -30,7 +30,7 @@ const static float DT = 0.0005f; // Time-step
 ----------------------------------------------------------------------- */
 
 /* ----- GRID ----- */
-const static float H_INV = 1.0f;
+const static float H_INV = 1.0f; // cell size ?
 
 /* ----- TRANSFER ----- */
 #if INTERPOLATION == 1

@@ -3,7 +3,8 @@ COMPILE=-c -std=c++17 \
 -I/usr/local/Cellar/glew/2.1.0/include \
 -I/usr/local/Cellar/glfw/3.3/include \
 -I/usr/local/Cellar/eigen/3.3.7/include/eigen3 \
--I/usr/local/Cellar/opencv/4.1.1_2/include/opencv4
+-I/usr/local/Cellar/opencv/4.1.1_2/include/opencv4 \
+-I/usr/local/Cellar/glm/0.9.9.5/include
 LINK=-L/usr/local/Cellar/glew/2.1.0/lib -lGLEW \
 -L/usr/local/Cellar/glfw/3.3/lib -lglfw \
 -L/usr/local/Cellar/opencv/4.1.1_2/lib -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_imgproc \
@@ -11,7 +12,7 @@ LINK=-L/usr/local/Cellar/glew/2.1.0/lib -lGLEW \
 
 all: main
 
-main: main.o border.o node.o particle.o solver.o algebra.o
+main: main.o border.o node.o particle.o solver.o algebra.o sdf.o
 	$(CXX) $(LINK) $^ -o $@
 	rm -rv *.o
 
@@ -31,4 +32,7 @@ solver.o: solver.cpp
 	$(CXX) $(COMPILE) $^ -o $@
 
 algebra.o: algebra.cpp
+	$(CXX) $(COMPILE) $^ -o $@
+
+sdf.o: sdf.cpp
 	$(CXX) $(COMPILE) $^ -o $@

@@ -34,17 +34,18 @@ void Initialization() {
   std::vector<Border> inBorders = Border::InitializeBorders();
   std::vector<Node> inNodes = Node::InitializeNodes();
   std::vector<Material> inParticles = Material::InitializeParticles();
+  std::vector<Polygon> inPolygons = Polygon::InitializePolygons();
 
-  Simulation = new Solver(inBorders, inNodes, inParticles);
+  // std::cout << inPolygons.size() << '\n';
+
+  Simulation = new Solver(inBorders, inNodes, inParticles, inPolygons);
 }
 
 void Update() {
-  Simulation->P2G();         // Transfer data from Particles to Grid Nodes
-  Simulation->UpdateNodes(); // Update nodes data
-  Simulation->G2P();         // Transfer data from Grid Nodes to Particles
-
-  // BUG: Something wrong in this method.
-  // Simulation->UpdateParticles(); // Update particles data
+  Simulation->P2G();             // Transfer data from Particles to Grid Nodes
+  Simulation->UpdateNodes();     // Update nodes data
+  Simulation->G2P();             // Transfer data from Grid Nodes to Particles
+  Simulation->UpdateParticles(); // Update particles data
 }
 
 // Add particle during the simulation
@@ -85,9 +86,11 @@ int main(int argc, char **argv) {
 
 #else
   /* [2] : show result on OpenGL window, and record an .mp4 if selected */
+  const int frameLimit = 3;
+
   GLFWwindow *window = initGLFWContext();
   initGLContext();
-  while (!glfwWindowShouldClose(window)) {
+  while (!glfwWindowShouldClose(window) && frameNumber < frameLimit) {
 
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -96,10 +99,10 @@ int main(int argc, char **argv) {
     // AddParticles();
 
     // P2G, compute grid forces, etc.
-    Update(); // BUG
+    Update();
 
-    if (t_count % (int)(DT_render / DT) == 0) // Display frame at desired rate
-    {
+    // Display frame at desired rate
+    if (t_count % (int)(DT_render / DT) == 0) {
       Simulation->Draw();
       glfwSwapBuffers(window);
 
@@ -128,13 +131,13 @@ int main(int argc, char **argv) {
 #endif
 
       glfwPollEvents();
-    }
+    } // end outer if
 
     // Don't forget to reset grid every frame !!
     Simulation->ResetGrid();
 
     t_count++;
-  }
+  } // end while
 
   // #if RECORD_VIDEO
   //   images2video();

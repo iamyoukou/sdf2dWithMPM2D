@@ -3,14 +3,17 @@
 /* Constructors */
 Solver::Solver(const std::vector<Border> &inBorders,
                const std::vector<Node> &inNodes,
-               const std::vector<Material> &inParticles) {
+               const std::vector<Material> &inParticles,
+               const std::vector<Polygon> &inPolygons) {
   borders = inBorders;
   nodes = inNodes;
   particles = inParticles;
+  polygons = inPolygons;
 
   blen = borders.size();
   ilen = nodes.size();
   plen = particles.size();
+  polylen = polygons.size();
 }
 
 /* -----------------------------------------------------------------------
@@ -185,6 +188,11 @@ void Solver::Draw() {
   // Draw borders
   for (size_t b = 0; b < blen; b++) {
     borders[b].DrawBorder();
+  }
+
+  // Draw polygons
+  for (size_t i = 0; i < polylen; i++) {
+    polygons[i].DrawPolygon();
   }
 
   // Draw nodes

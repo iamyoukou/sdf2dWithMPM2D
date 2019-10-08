@@ -2,6 +2,7 @@
 
 #include "node.h"
 #include "particle.h"
+#include "sdf.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -16,13 +17,15 @@ public:
   std::vector<Border> borders;
   std::vector<Node> nodes;
   std::vector<Material> particles;
+  std::vector<Polygon> polygons;
 
-  size_t ilen, blen, plen;
+  size_t ilen, blen, plen, polylen;
 
   /* Constructors */
   Solver(){};
   Solver(const std::vector<Border> &inBorders, const std::vector<Node> &inNodes,
-         const std::vector<Material> &inParticles);
+         const std::vector<Material> &inParticles,
+         const std::vector<Polygon> &inPolygons);
   ~Solver(){};
 
   /* Functions */
