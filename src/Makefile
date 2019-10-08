@@ -1,5 +1,5 @@
 CXX=llvm-g++
-COMPILE=-c -std=c++17 \
+COMPILE=-g -c -std=c++17 \
 -I/usr/local/Cellar/glew/2.1.0/include \
 -I/usr/local/Cellar/glfw/3.3/include \
 -I/usr/local/Cellar/eigen/3.3.7/include/eigen3 \

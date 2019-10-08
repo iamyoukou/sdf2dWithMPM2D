@@ -43,6 +43,7 @@ public:
   float nearest_distance(glm::vec2, Polygon &);
   float getDistance(glm::vec2);
   glm::vec2 getGradient(glm::vec2);
+  void applySdfCollision(Node &);
 
   void Draw(); // Draw particles, border and nodes (if selected)
   void WriteToFile(

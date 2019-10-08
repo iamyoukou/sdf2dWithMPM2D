@@ -40,6 +40,7 @@ const static glm::vec2 worldOrigin(0.f, 0.f);
 const static float sdfCellSize = H_INV;
 const static int sdfWidth = X_GRID;
 const static int sdfHeight = Y_GRID;
+const static float NARROW_BAND = 1.f;
 
 /* ----- TRANSFER ----- */
 #if INTERPOLATION == 1

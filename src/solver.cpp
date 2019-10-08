@@ -125,6 +125,7 @@ float Solver::getDistance(glm::vec2 p) {
     return 9999.f;
   } else {
     int idx = idx_x + idx_y * (sdfWidth - 1);
+    // std::cout << idx << '\n';
     return nodes[idx].sdfDist;
   }
 }
@@ -157,6 +158,84 @@ glm::vec2 Solver::getGradient(glm::vec2 p) {
   gd = glm::normalize(-gd);
 
   return gd;
+}
+
+void Solver::applySdfCollision(Node &node) {
+  // node world space position
+  glm::vec2 pos(node.Xi[0], node.Xi[1]);
+  glm::vec2 v(node.Vi[0], node.Vi[1]);
+
+  // std::cout << glm::to_string(pos) << '\n';
+
+  // distance
+  float dist = getDistance(pos);
+  glm::vec2 n;
+  // Polygon *co; // collision object
+  bool isCollisionOn = false;
+
+  glm::vec2 vco(0.f, 0.f);
+
+  // 基于 sdf 的碰撞检测
+  // 和边界处的碰撞检测
+  // 唯一不同的是法向量 n 的计算方式
+  // 而碰撞后的速度，采用同样��处理
+  // for sdf collision detection
+  // narrow band threshold
+  if (glm::abs(dist) < NARROW_BAND) {
+    n = -getGradient(pos);
+    // co = getPolygon(pos); // get collision object
+    isCollisionOn = true;
+
+    // object velocity
+    // linear
+    // vec2 vlin = co->v;
+    glm::vec2 vlin(0.f, 0.f);
+
+    // rotational
+    // vec2 center = (co->lb + co->rt) * 0.5f;
+    // vec2 r = pos - center;
+    //
+    // vec2 vrot;
+    // vrot.x = -r.y / length(r);
+    // vrot.y = r.x / length(r);
+    glm::vec2 vrot(0.f, 0.f);
+
+    // for visualization convenience
+    float scale = 0.1f;
+
+    // vrot *= co->omega * length(r) * scale;
+
+    vco = vlin + vrot;
+
+    // relative velocity
+    glm::vec2 vrel = v - vco;
+
+    float vnLength = glm::dot(n, vrel);
+    // std::cout << vnLength << ", " << isCollisionOn << '\n';
+
+    // if not separating
+    if (vnLength < 0.f && isCollisionOn) {
+      glm::vec2 vt = vrel - vnLength * n;
+      float mu = 0.55f;
+
+      if (length(vt) <= -mu * vnLength) {
+        vrel = glm::vec2(0.f, 0.f);
+      } else {
+        vrel = vt + mu * vnLength * normalize(vt);
+      }
+
+      // back to particle velocity
+      v = vrel + vco;
+
+      // std::cout << v.x << ", " << v.y << '\n';
+
+      node.Vi[0] = v.x;
+      node.Vi[1] = v.y;
+
+      // std::cout << "node velocity: " << node.Vi[0] << ", " << node.Vi[1]
+      //           << '\n';
+    }
+  }
 }
 
 /* -----------------------------------------------------------------------
@@ -233,7 +312,9 @@ void Solver::UpdateNodes() {
       nodes[i].Vi += nodes[i].Fi;
 
       // Apply collisions and frictions
-      nodes[i].NodeCollisions();
+      applySdfCollision(nodes[i]); // sdf-based
+
+      nodes[i].NodeCollisions(); // borders
 #if FRICTION
       nodes[i].NodeFrictions();
 #else

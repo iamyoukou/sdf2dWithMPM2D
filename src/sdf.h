@@ -59,7 +59,7 @@ public:
 
     polys.push_back(square);
     polys.push_back(object2);
-    polys.push_back(object3);
+    // polys.push_back(object3);
 
     return polys;
   }

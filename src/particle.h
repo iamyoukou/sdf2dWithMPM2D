@@ -191,7 +191,7 @@ public:
     float VOL = 2 * PI * R_BALL * R_BALL / static_cast<float>(NP);
     float MASS = VOL * RHO_snow / 100.0f;
 
-    Vector2f v = Vector2f(0.f, -9.8f); // Initial velocity
+    Vector2f v = Vector2f(0.f, -9.8f * 10.f); // Initial velocity
     Matrix2f a = Matrix2f(0);
 
     // get position from image

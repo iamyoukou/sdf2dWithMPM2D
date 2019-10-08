@@ -11,7 +11,7 @@ public:
   /* Data */
   float Mi; // Node mass
 
-  Vector2f Xi;     // Node position
+  Vector2f Xi;     // Node position (index, also world space position)
   Vector2f Vi;     // Node velocity, before update and after force
   Vector2f Vi_col; // Node velocity, after collision
   Vector2f Vi_fri; // Node velocity, after friction
