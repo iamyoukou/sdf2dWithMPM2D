@@ -9,6 +9,7 @@
 /* Declarations */
 void initGLContext();
 GLFWwindow *initGLFWContext();
+void drawSdf(GLFWwindow *);
 Solver *Simulation;
 int t_count = 0;
 int frameNumber = 0;
@@ -36,9 +37,9 @@ void Initialization() {
   std::vector<Material> inParticles = Material::InitializeParticles();
   std::vector<Polygon> inPolygons = Polygon::InitializePolygons();
 
-  // std::cout << inPolygons.size() << '\n';
-
   Simulation = new Solver(inBorders, inNodes, inParticles, inPolygons);
+
+  Simulation->computeSdf(); // for static objects, compute only once
 }
 
 void Update() {
@@ -86,10 +87,11 @@ int main(int argc, char **argv) {
 
 #else
   /* [2] : show result on OpenGL window, and record an .mp4 if selected */
-  const int frameLimit = 3;
+  const int frameLimit = 99999;
 
   GLFWwindow *window = initGLFWContext();
   initGLContext();
+
   while (!glfwWindowShouldClose(window) && frameNumber < frameLimit) {
 
     glClear(GL_COLOR_BUFFER_BIT);
@@ -99,42 +101,47 @@ int main(int argc, char **argv) {
     // AddParticles();
 
     // P2G, compute grid forces, etc.
-    Update();
+    // Update();
 
     // Display frame at desired rate
     if (t_count % (int)(DT_render / DT) == 0) {
       Simulation->Draw();
+
+      // for testing sdf
+      drawSdf(window);
+
       glfwSwapBuffers(window);
 
-#if RECORD_VIDEO
-      std::string dir = "../result/sim";
-
-      // zero padding
-      std::string num = std::to_string(frameNumber);
-      num = std::string(4 - num.length(), '0') + num;
-      std::string output = dir + num + ".png";
-
-      // use opencv to save a frame
-      // the frame size becomes twice from frame 2,
-      // thus multiplying 2 is needed.
-      // don't know why
-      cv::Mat outImg(Y_WINDOW * 2, X_WINDOW * 2, CV_8UC3);
-      glPixelStorei(GL_PACK_ALIGNMENT, 4);
-      glReadPixels(0, 0, X_WINDOW * 2, Y_WINDOW * 2, GL_BGR, GL_UNSIGNED_BYTE,
-                   (GLvoid *)outImg.data);
-      cv::flip(outImg, outImg, 0);
-      cv::imwrite(output, outImg);
-
-      std::cout << "Frame " << frameNumber << " saved." << '\n';
-
-      frameNumber++;
-#endif
+      // #if RECORD_VIDEO
+      //       std::string dir = "../result/sim";
+      //
+      //       // zero padding
+      //       std::string num = std::to_string(frameNumber);
+      //       num = std::string(4 - num.length(), '0') + num;
+      //       std::string output = dir + num + ".png";
+      //
+      //       // use opencv to save a frame
+      //       // the frame size becomes twice from frame 2,
+      //       // thus multiplying 2 is needed.
+      //       // don't know why
+      //       cv::Mat outImg(Y_WINDOW * 2, X_WINDOW * 2, CV_8UC3);
+      //       glPixelStorei(GL_PACK_ALIGNMENT, 4);
+      //       glReadPixels(0, 0, X_WINDOW * 2, Y_WINDOW * 2, GL_BGR,
+      //       GL_UNSIGNED_BYTE,
+      //                    (GLvoid *)outImg.data);
+      //       cv::flip(outImg, outImg, 0);
+      //       cv::imwrite(output, outImg);
+      //
+      //       std::cout << "Frame " << frameNumber << " saved." << '\n';
+      //
+      //       frameNumber++;
+      // #endif
 
       glfwPollEvents();
     } // end outer if
 
     // Don't forget to reset grid every frame !!
-    Simulation->ResetGrid();
+    // Simulation->ResetGrid();
 
     t_count++;
   } // end while
@@ -186,4 +193,40 @@ void initGLContext() {
 
   glClearColor(.659f, .694f, .82f, .0f);
   glClear(GL_COLOR_BUFFER_BIT);
+}
+
+// for testing sdf
+void drawSdf(GLFWwindow *wnd) {
+  double xpos, ypos;
+  glfwGetCursorPos(wnd, &xpos, &ypos);
+
+  float fx, fy;
+  fx = xpos / (float)X_WINDOW;
+  fy = ypos / (float)Y_WINDOW;
+
+  // Note: (0, 0) is at right-bottom
+  float wx, wy;
+  wx = fx * X_GRID;
+  wy = (1.f - fy) * Y_GRID;
+
+  // for test
+  // draw sdf gradient at a given point
+  glm::vec2 start = glm::vec2(wx, wy);
+  float dist = Simulation->getDistance(start);
+  glm::vec2 grad = Simulation->getGradient(start);
+  glm::vec2 end = start + dist * grad;
+
+  // start.x = start.x / (float)X_GRID * (float)X_WINDOW;
+  // start.y = start.y / (float)Y_GRID * (float)Y_WINDOW;
+  //
+  // end.x = end.x / (float)X_GRID * (float)X_WINDOW;
+  // end.y = end.y / (float)Y_GRID * (float)Y_WINDOW;
+
+  glLineWidth(4);
+  glColor3f(1.f, 0.f, 0.f);
+
+  glBegin(GL_LINES);
+  glVertex2f(start.x, start.y); // start point
+  glVertex2f(end.x, end.y);     // end point
+  glEnd();
 }

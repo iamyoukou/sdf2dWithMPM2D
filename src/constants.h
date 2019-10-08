@@ -1,6 +1,9 @@
 #pragma once
 
 #include "algebra.h"
+#include <glm/glm.hpp>
+#include <glm/gtx/compatibility.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 /* -----------------------------------------------------------------------
 |									OPTIONS
@@ -31,6 +34,12 @@ const static float DT = 0.0005f; // Time-step
 
 /* ----- GRID ----- */
 const static float H_INV = 1.0f; // cell size ?
+
+/* for sdf */
+const static glm::vec2 worldOrigin(0.f, 0.f);
+const static float sdfCellSize = H_INV;
+const static int sdfWidth = X_GRID;
+const static int sdfHeight = Y_GRID;
 
 /* ----- TRANSFER ----- */
 #if INTERPOLATION == 1

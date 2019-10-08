@@ -2,6 +2,7 @@
 
 #include "node.h"
 #include "particle.h"
+#include "constants.h"
 #include "sdf.h"
 #include <string>
 #include <iostream>
@@ -34,6 +35,14 @@ public:
   void G2P(); // Transfer from Grid nodes to Particles
   void UpdateParticles();
   void ResetGrid();
+
+  /* Functions for computing sdf */
+  void computeSdf();
+  bool intersect(glm::vec2, glm::vec2, glm::vec2, glm::vec2);
+  bool inside_polygon(glm::vec2, Polygon &);
+  float nearest_distance(glm::vec2, Polygon &);
+  float getDistance(glm::vec2);
+  glm::vec2 getGradient(glm::vec2);
 
   void Draw(); // Draw particles, border and nodes (if selected)
   void WriteToFile(

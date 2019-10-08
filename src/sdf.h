@@ -10,8 +10,6 @@
 #include <glm/gtx/compatibility.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-extern glm::vec2 worldOrigin;
-
 class Polygon {
 public:
   std::vector<glm::vec2> vertices;
@@ -51,7 +49,3 @@ public:
     return polys;
   }
 }; // end class Polygon
-
-bool intersect(glm::vec2, glm::vec2, glm::vec2, glm::vec2);
-bool inside_polygon(glm::vec2, Polygon &);
-float nearest_distance(glm::vec2, Polygon &);
