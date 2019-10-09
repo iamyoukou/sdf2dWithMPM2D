@@ -88,7 +88,9 @@ void Polygon::scale(float factor) {
 void Polygon::DrawPolygon() {
   glColor3f(.616f, 0.29f, 0.663f);
 
-  glBegin(GL_POLYGON);
+  GLenum mode = isConvex ? GL_POLYGON : GL_TRIANGLES;
+
+  glBegin(mode);
   for (size_t i = 0; i < vertices.size(); i++) {
     glVertex2f(vertices[i].x, vertices[i].y);
   }

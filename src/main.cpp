@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
     // AddParticles();
 
     // P2G, compute grid forces, etc.
-    Update();
+    // Update();
 
     // Display frame at desired rate
     if (t_count % (int)(DT_render / DT) == 0) {
@@ -112,42 +112,43 @@ int main(int argc, char **argv) {
 
       glfwSwapBuffers(window);
 
-#if RECORD_VIDEO
-      std::string dir = "../result/sim";
-
-      // zero padding
-      std::string num = std::to_string(frameNumber);
-      num = std::string(4 - num.length(), '0') + num;
-      std::string output = dir + num + ".png";
-
-      // use opencv to save a frame
-      // the frame size becomes twice from frame 2,
-      // thus multiplying 2 is needed.
-      // don't know why
-      cv::Mat outImg(Y_WINDOW * 2, X_WINDOW * 2, CV_8UC3);
-      glPixelStorei(GL_PACK_ALIGNMENT, 4);
-      glReadPixels(0, 0, X_WINDOW * 2, Y_WINDOW * 2, GL_BGR, GL_UNSIGNED_BYTE,
-                   (GLvoid *)outImg.data);
-      cv::flip(outImg, outImg, 0);
-      cv::imwrite(output, outImg);
-
-      std::cout << "Frame " << frameNumber << " saved." << '\n';
-
-      frameNumber++;
-#endif
+      // #if RECORD_VIDEO
+      //       std::string dir = "../result/sim";
+      //
+      //       // zero padding
+      //       std::string num = std::to_string(frameNumber);
+      //       num = std::string(4 - num.length(), '0') + num;
+      //       std::string output = dir + num + ".png";
+      //
+      //       // use opencv to save a frame
+      //       // the frame size becomes twice from frame 2,
+      //       // thus multiplying 2 is needed.
+      //       // don't know why
+      //       cv::Mat outImg(Y_WINDOW * 2, X_WINDOW * 2, CV_8UC3);
+      //       glPixelStorei(GL_PACK_ALIGNMENT, 4);
+      //       glReadPixels(0, 0, X_WINDOW * 2, Y_WINDOW * 2, GL_BGR,
+      //       GL_UNSIGNED_BYTE,
+      //                    (GLvoid *)outImg.data);
+      //       cv::flip(outImg, outImg, 0);
+      //       cv::imwrite(output, outImg);
+      //
+      //       std::cout << "Frame " << frameNumber << " saved." << '\n';
+      //
+      //       frameNumber++;
+      // #endif
 
       glfwPollEvents();
     } // end outer if
 
     // Don't forget to reset grid every frame !!
-    Simulation->ResetGrid();
+    // Simulation->ResetGrid();
 
     t_count++;
   } // end while
 
-#if RECORD_VIDEO
-  images2video();
-#endif
+  // #if RECORD_VIDEO
+  //   images2video();
+  // #endif
 
   glfwTerminate();
 #endif
