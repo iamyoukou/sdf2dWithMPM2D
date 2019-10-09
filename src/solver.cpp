@@ -16,7 +16,10 @@ Solver::Solver(const std::vector<Border> &inBorders,
   polylen = polygons.size();
 }
 
-/* Functions for computing sdf */
+/* -----------------------------------------------------------------------
+|			          Functions for computing sdf
+|
+----------------------------------------------------------------------- */
 void Solver::computeSdf() {
   // compute sdf for (sdfWidth * sdfHeight) world space points
   // the interval between two adjacent points is sdfCellSize
@@ -30,6 +33,9 @@ void Solver::computeSdf() {
       float fDist = 9999.f;
       float temp = 0.f;
 
+      // node index
+      int idx = x + y * (sdfWidth - 1); // # of nodes in a row is (sdfWidth - 1)
+
       for (int i = 0; i < polygons.size(); i++) {
         // std::cout << i << '\n';
         temp = (inside_polygon(p, polygons[i])) ? -1.f : 1.f;
@@ -40,14 +46,12 @@ void Solver::computeSdf() {
         if (temp < fDist) {
           fDist = temp;
 
-          // change to Node
-          // the nearest polygon to this node
-          // grid.polyPtrs.set(y, x, polygons[i]);
+          // the nearest polygon from this node
+          nodes[idx].nearestPolygonPtr = &polygons[i];
         }
       }
 
       // save sdf distance
-      int idx = x + y * (sdfWidth - 1); // # of nodes in a row is (sdfWidth - 1)
       nodes[idx].sdfDist = fDist;
       // std::cout << "(" << x << ", " << y << ") distance = " << fDist << '\n';
     }
@@ -73,11 +77,11 @@ bool Solver::intersect(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3, glm::vec2 p4) {
 bool Solver::inside_polygon(glm::vec2 p, Polygon &poly) {
   int count = 0;
   glm::vec2 q(1234567.f, 1234567.f); // a point at the infinity
-  int len = poly.vertices.size();
+  int len = poly.sdfVertices.size();
 
   for (int i = 0; i < len; i++) {
-    glm::vec2 &start = poly.vertices[i];
-    glm::vec2 &end = poly.vertices[(i + 1) % len];
+    glm::vec2 &start = poly.sdfVertices[i];
+    glm::vec2 &end = poly.sdfVertices[(i + 1) % len];
     count += intersect(p, q, start, end);
   }
 
@@ -86,11 +90,11 @@ bool Solver::inside_polygon(glm::vec2 p, Polygon &poly) {
 
 float Solver::nearest_distance(glm::vec2 p, Polygon &poly) {
   float dist = 9999.f;
-  int len = poly.vertices.size();
+  int len = poly.sdfVertices.size();
 
   for (int i = 0; i < len; i++) {
-    glm::vec2 &a = poly.vertices[i];
-    glm::vec2 &b = poly.vertices[(i + 1) % len];
+    glm::vec2 &a = poly.sdfVertices[i];
+    glm::vec2 &b = poly.sdfVertices[(i + 1) % len];
 
     //当前处理的边定义为 ab
     glm::vec2 ab = b - a;
@@ -160,6 +164,23 @@ glm::vec2 Solver::getGradient(glm::vec2 p) {
   return gd;
 }
 
+// p is world position
+Polygon *Solver::getPolygon(glm::vec2 p) {
+  // world position to sdf index
+  int idx_x, idx_y;
+  idx_x = int(glm::floor(p.x / sdfCellSize));
+  idx_y = int(glm::floor(p.y / sdfCellSize));
+
+  if (idx_x < 0 || idx_x > sdfWidth - 1) {
+    return NULL;
+  } else if (idx_y < 0.f || idx_y > sdfHeight - 1) {
+    return NULL;
+  } else {
+    int idx = idx_x + idx_y * (sdfWidth - 1);
+    return nodes[idx].nearestPolygonPtr;
+  }
+}
+
 void Solver::applySdfCollision(Node &node) {
   // node world space position
   glm::vec2 pos(node.Xi[0], node.Xi[1]);
@@ -170,7 +191,7 @@ void Solver::applySdfCollision(Node &node) {
   // distance
   float dist = getDistance(pos);
   glm::vec2 n;
-  // Polygon *co; // collision object
+  Polygon *co; // collision object
   bool isCollisionOn = false;
 
   glm::vec2 vco(0.f, 0.f);
@@ -183,13 +204,12 @@ void Solver::applySdfCollision(Node &node) {
   // narrow band threshold
   if (glm::abs(dist) < NARROW_BAND) {
     n = -getGradient(pos);
-    // co = getPolygon(pos); // get collision object
+    co = getPolygon(pos); // get collision object
     isCollisionOn = true;
 
     // object velocity
     // linear
-    // vec2 vlin = co->v;
-    glm::vec2 vlin(0.f, 0.f);
+    glm::vec2 vlin = co->v;
 
     // rotational
     // vec2 center = (co->lb + co->rt) * 0.5f;
@@ -201,7 +221,7 @@ void Solver::applySdfCollision(Node &node) {
     glm::vec2 vrot(0.f, 0.f);
 
     // for visualization convenience
-    float scale = 0.1f;
+    // float scale = 0.1f;
 
     // vrot *= co->omega * length(r) * scale;
 
@@ -400,6 +420,16 @@ void Solver::ResetGrid() {
   for (int i = 0; i < ilen; i++)
     if (nodes[i].Mi > 0)
       nodes[i].ResetNode();
+}
+
+/* -----------------------------------------------------------------------
+|								  OTHER
+|
+----------------------------------------------------------------------- */
+void Solver::MovePolygons() {
+  for (size_t i = 0; i < polylen; i++) {
+    polygons[i].translate(DT * polygons[i].v);
+  }
 }
 
 /* -----------------------------------------------------------------------

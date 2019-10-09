@@ -17,11 +17,22 @@ void Polygon::computeAabb() {
   }
 }
 
-void Polygon::add(glm::vec2 vtx) { vertices.push_back(vtx); }
+void Polygon::add(glm::vec2 vtx, bool isSdf) {
+  if (isSdf) {
+    sdfVertices.push_back(vtx);
+  } else {
+    vertices.push_back(vtx);
+  }
+}
 
 void Polygon::translate(glm::vec2 xy) {
+  // vertices and sdfVertices share the same transformation
   for (int i = 0; i < vertices.size(); i++) {
     vertices[i] += xy;
+  }
+
+  for (int i = 0; i < sdfVertices.size(); i++) {
+    sdfVertices[i] += xy;
   }
 
   // update aabb
@@ -60,6 +71,10 @@ void Polygon::rotate(float theta) {
     vertices[i] = applyRotate(vertices[i], theta, offset);
   }
 
+  for (int i = 0; i < sdfVertices.size(); i++) {
+    sdfVertices[i] = applyRotate(sdfVertices[i], theta, offset);
+  }
+
   // update aabb
   computeAabb();
 }
@@ -80,13 +95,17 @@ void Polygon::scale(float factor) {
     vertices[i] = applyScale(vertices[i], factor, offset);
   }
 
+  for (int i = 0; i < sdfVertices.size(); i++) {
+    sdfVertices[i] = applyScale(sdfVertices[i], factor, offset);
+  }
+
   // update aabb
   lb = applyScale(lb, factor, offset);
   rt = applyScale(rt, factor, offset);
 }
 
 void Polygon::DrawPolygon() {
-  glColor3f(.616f, 0.29f, 0.663f);
+  glColor3f(r, g, b);
 
   GLenum mode = isConvex ? GL_POLYGON : GL_TRIANGLES;
 

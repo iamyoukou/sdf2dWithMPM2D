@@ -2,6 +2,7 @@
 
 #include "constants.h"
 #include "border.h"
+#include "sdf.h"
 #include <iostream>
 
 /* The node class defines the background grid. */
@@ -21,6 +22,7 @@ public:
   /* for sdf-based collision detection */
   float sdfDist;
   Vector2f sdfGrad;
+  Polygon *nearestPolygonPtr;
 
   std::vector<int>
       CollisionObjects; // List of borders on which the node collides
