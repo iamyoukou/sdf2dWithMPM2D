@@ -79,9 +79,9 @@ const static float DT_render = DT * 30.0f; // Rate of frame rendered (OpenGL)
 #define FRICTION true
 #endif
 
-// const static Vector2f G = Vector2f(0.0f, -9.81f); // Gravity
-const static Vector2f G = Vector2f(0.0f, 0.f); // for test
-const static float CFRI = 0.3f;                // Friction coefficient
+const static Vector2f G = Vector2f(0.0f, -9.81f); // Gravity
+// const static Vector2f G = Vector2f(0.0f, 0.f); // for test
+const static float CFRI = 0.3f; // Friction coefficient
 
 /* Water */
 const static float RHO_water = 1.0f; // Density

@@ -13,6 +13,7 @@ void drawSdf(GLFWwindow *);
 Solver *Simulation;
 int t_count = 0;
 int frameNumber = 0;
+bool mask1 = true, mask2 = true; // for animation controlling
 
 /* For video */
 void images2video() {
@@ -46,15 +47,28 @@ void Initialization() {
 }
 
 void Update() {
+  // for user-defined special effects
+  // if (frameNumber == 51 && mask1) {
+  //   Simulation->polygons[0].v = -Simulation->polygons[0].v;
+  //   mask1 = false;
+  // } else if (frameNumber == 76 && mask2) {
+  //   Simulation->polygons[0].v = glm::vec2(0.f, 0.f);
+  //   mask2 = false;
+  // }
+
   // move objects
   Simulation->MovePolygons();
   // Simulation->computeSdf(); // for dynamic objects, update sdf every frame
 
   // MPM steps
-  Simulation->P2G();             // Transfer data from Particles to Grid Nodes
-  Simulation->UpdateNodes();     // Update nodes data
-  Simulation->G2P();             // Transfer data from Grid Nodes to Particles
-  Simulation->UpdateParticles(); // Update particles data
+  // Transfer data from Particles to Grid Nodes
+  Simulation->P2G();
+  // Update nodes data
+  Simulation->UpdateNodes();
+  // Transfer data from Grid Nodes to Particles
+  Simulation->G2P();
+  // Update particles data
+  Simulation->UpdateParticles();
 }
 
 // Add particle during the simulation
@@ -109,9 +123,12 @@ int main(int argc, char **argv) {
     // AddParticles();
 
     // P2G, compute grid forces, etc.
-    // Update();
+    Update();
 
     // Display frame at desired rate
+    // t_count accounts for the t_count-th time step
+    // (DT_render / DT) time steps equal to one frame (counted by frameNumber)
+    // By default, 1 frame = 66 time steps
     if (t_count % (int)(DT_render / DT) == 0) {
       Simulation->Draw();
 
@@ -120,32 +137,31 @@ int main(int argc, char **argv) {
 
       glfwSwapBuffers(window);
 
-      // #if RECORD_VIDEO
-      //       std::string dir = "../result/sim";
-      //
-      //       // zero padding
-      //       std::string num = std::to_string(frameNumber);
-      //       num = std::string(4 - num.length(), '0') + num;
-      //       std::string output = dir + num + ".png";
-      //
-      //       // use opencv to save a frame
-      //       // the frame size becomes twice from frame 2,
-      //       // thus multiplying 2 is needed.
-      //       // don't know why
-      //       cv::Mat outImg(Y_WINDOW * 2, X_WINDOW * 2, CV_8UC3);
-      //       glPixelStorei(GL_PACK_ALIGNMENT, 4);
-      //       glReadPixels(0, 0, X_WINDOW * 2, Y_WINDOW * 2, GL_BGR,
-      //       GL_UNSIGNED_BYTE,
-      //                    (GLvoid *)outImg.data);
-      //       cv::flip(outImg, outImg, 0);
-      //       cv::imwrite(output, outImg);
-      //
-      //       std::cout << "Frame " << frameNumber << " saved." << '\n';
-      //
-      //       frameNumber++;
-      // #endif
+#if RECORD_VIDEO
+      std::string dir = "../result/sim";
+
+      // zero padding
+      std::string num = std::to_string(frameNumber);
+      num = std::string(4 - num.length(), '0') + num;
+      std::string output = dir + num + ".png";
+
+      // use opencv to save a frame
+      // the frame size becomes twice from frame 2,
+      // thus multiplying 2 is needed.
+      // don't know why
+      cv::Mat outImg(Y_WINDOW * 2, X_WINDOW * 2, CV_8UC3);
+      glPixelStorei(GL_PACK_ALIGNMENT, 4);
+      glReadPixels(0, 0, X_WINDOW * 2, Y_WINDOW * 2, GL_BGR, GL_UNSIGNED_BYTE,
+                   (GLvoid *)outImg.data);
+      cv::flip(outImg, outImg, 0);
+      cv::imwrite(output, outImg);
+
+      std::cout << "Frame " << frameNumber << " saved." << '\n';
+#endif
 
       glfwPollEvents();
+
+      frameNumber++;
     } // end outer if
 
     // Don't forget to reset grid every frame !!
@@ -154,9 +170,9 @@ int main(int argc, char **argv) {
     t_count++;
   } // end while
 
-  // #if RECORD_VIDEO
-  //   images2video();
-  // #endif
+#if RECORD_VIDEO
+  images2video();
+#endif
 
   glfwTerminate();
 #endif

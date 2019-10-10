@@ -39,13 +39,19 @@ public:
   static std::vector<Polygon> InitializePolygons() {
     std::vector<Polygon> polys;
 
-    // Polygon square;
-    // square.isConvex = true;
-    // square.add(glm::vec2(146.5f, 12.f));
-    // square.add(glm::vec2(104.f, 49.f));
-    // square.add(glm::vec2(150.5f, 84.f));
-    // square.add(glm::vec2(200.5f, 56.f));
-    // square.computeAabb();
+    Polygon square;
+    square.isConvex = true;
+    square.add(glm::vec2(146.5f, 12.f), NORMAL_VTX);
+    square.add(glm::vec2(104.f, 49.f), NORMAL_VTX);
+    square.add(glm::vec2(150.5f, 84.f), NORMAL_VTX);
+    square.add(glm::vec2(200.5f, 56.f), NORMAL_VTX);
+    square.computeAabb();
+    square.translate(glm::vec2(0.f, 50.f));
+    square.r = 0.616f;
+    square.g = 0.29f;
+    square.b = 0.663f;
+    square.v = glm::vec2(0.f, 0.f);
+    square.omega = 1.f;
     //
     // Polygon object2;
     // object2.add(glm::vec2(29.5f, 87.5f));
@@ -61,71 +67,71 @@ public:
     // object3.computeAabb();
 
     // Knife A
-    Polygon knifeA;
-    knifeA.isConvex = false;
-    // vertices for sdf
-    // When compute sdf, use the original convex
-    knifeA.add(glm::vec2(68.5f, 161.f), SDF_VTX);   // 0
-    knifeA.add(glm::vec2(131.5f, 161.f), SDF_VTX);  // 1
-    knifeA.add(glm::vec2(131.5f, 173.f), SDF_VTX);  // 2
-    knifeA.add(glm::vec2(143.5f, 173.f), SDF_VTX);  // 3
-    knifeA.add(glm::vec2(143.5f, 164.5f), SDF_VTX); // 4
-    knifeA.add(glm::vec2(220.5f, 164.5f), SDF_VTX); // 5
-    knifeA.add(glm::vec2(244.f, 151.f), SDF_VTX);   // 6
-    knifeA.add(glm::vec2(220.5f, 137.5f), SDF_VTX); // 7
-    knifeA.add(glm::vec2(143.5f, 137.5f), SDF_VTX); // 8
-    knifeA.add(glm::vec2(143.5f, 129.f), SDF_VTX);  // 9
-    knifeA.add(glm::vec2(131.5f, 129.f), SDF_VTX);  // 10
-    knifeA.add(glm::vec2(131.5f, 141.f), SDF_VTX);  // 11
-    knifeA.add(glm::vec2(68.5f, 141.f), SDF_VTX);   // 12
-    // vertices for drawing
-    // Since opengl cannot draw concaves,
-    // I separate the polygon into several triangles
-    // triangle 1
-    knifeA.add(glm::vec2(68.5f, 161.f), NORMAL_VTX);  // 0
-    knifeA.add(glm::vec2(131.5f, 141.f), NORMAL_VTX); // 11
-    knifeA.add(glm::vec2(68.5f, 141.f), NORMAL_VTX);  // 12
-    // triangle 2
-    knifeA.add(glm::vec2(68.5f, 161.f), NORMAL_VTX);  // 0
-    knifeA.add(glm::vec2(131.5f, 161.f), NORMAL_VTX); // 1
-    knifeA.add(glm::vec2(131.5f, 141.f), NORMAL_VTX); // 11
-    // triangle 3
-    knifeA.add(glm::vec2(131.5f, 173.f), NORMAL_VTX); // 2
-    knifeA.add(glm::vec2(143.5f, 173.f), NORMAL_VTX); // 3
-    knifeA.add(glm::vec2(131.5f, 129.f), NORMAL_VTX); // 10
-    // triangle 4
-    knifeA.add(glm::vec2(143.5f, 173.f), NORMAL_VTX); // 3
-    knifeA.add(glm::vec2(143.5f, 129.f), NORMAL_VTX); // 9
-    knifeA.add(glm::vec2(131.5f, 129.f), NORMAL_VTX); // 10
-    // triangle 5
-    knifeA.add(glm::vec2(143.5f, 164.5f), NORMAL_VTX); // 4
-    knifeA.add(glm::vec2(220.5f, 164.5f), NORMAL_VTX); // 5
-    knifeA.add(glm::vec2(143.5f, 137.5f), NORMAL_VTX); // 8
-    // triangle 6
-    knifeA.add(glm::vec2(220.5f, 164.5f), NORMAL_VTX); // 5
-    knifeA.add(glm::vec2(220.5f, 137.5f), NORMAL_VTX); // 7
-    knifeA.add(glm::vec2(143.5f, 137.5f), NORMAL_VTX); // 8
-    // triangle 7
-    knifeA.add(glm::vec2(220.5f, 164.5f), NORMAL_VTX); // 5
-    knifeA.add(glm::vec2(244.f, 151.f), NORMAL_VTX);   // 6
-    knifeA.add(glm::vec2(220.5f, 137.5f), NORMAL_VTX); // 7
-    // when finish adding vertices, don't forget to call computeAabb()
-    knifeA.computeAabb();
-    // transform
-    knifeA.translate(glm::vec2(-100.f, -25.f));
-    knifeA.rotate(45.f);
-    knifeA.scale(0.2f);
-    // other properties
-    knifeA.r = 0.616f;
-    knifeA.g = 0.29f;
-    knifeA.b = 0.663f;
-    knifeA.v = glm::vec2(0.f, 40.f);
-    knifeA.omega = 1.f;
+    // Polygon knifeA;
+    // knifeA.isConvex = false;
+    // // vertices for sdf
+    // // When compute sdf, use the original convex
+    // knifeA.add(glm::vec2(68.5f, 161.f), SDF_VTX);   // 0
+    // knifeA.add(glm::vec2(131.5f, 161.f), SDF_VTX);  // 1
+    // knifeA.add(glm::vec2(131.5f, 173.f), SDF_VTX);  // 2
+    // knifeA.add(glm::vec2(143.5f, 173.f), SDF_VTX);  // 3
+    // knifeA.add(glm::vec2(143.5f, 164.5f), SDF_VTX); // 4
+    // knifeA.add(glm::vec2(220.5f, 164.5f), SDF_VTX); // 5
+    // knifeA.add(glm::vec2(244.f, 151.f), SDF_VTX);   // 6
+    // knifeA.add(glm::vec2(220.5f, 137.5f), SDF_VTX); // 7
+    // knifeA.add(glm::vec2(143.5f, 137.5f), SDF_VTX); // 8
+    // knifeA.add(glm::vec2(143.5f, 129.f), SDF_VTX);  // 9
+    // knifeA.add(glm::vec2(131.5f, 129.f), SDF_VTX);  // 10
+    // knifeA.add(glm::vec2(131.5f, 141.f), SDF_VTX);  // 11
+    // knifeA.add(glm::vec2(68.5f, 141.f), SDF_VTX);   // 12
+    // // vertices for drawing
+    // // Since opengl cannot draw concaves,
+    // // I separate the polygon into several triangles
+    // // triangle 1
+    // knifeA.add(glm::vec2(68.5f, 161.f), NORMAL_VTX);  // 0
+    // knifeA.add(glm::vec2(131.5f, 141.f), NORMAL_VTX); // 11
+    // knifeA.add(glm::vec2(68.5f, 141.f), NORMAL_VTX);  // 12
+    // // triangle 2
+    // knifeA.add(glm::vec2(68.5f, 161.f), NORMAL_VTX);  // 0
+    // knifeA.add(glm::vec2(131.5f, 161.f), NORMAL_VTX); // 1
+    // knifeA.add(glm::vec2(131.5f, 141.f), NORMAL_VTX); // 11
+    // // triangle 3
+    // knifeA.add(glm::vec2(131.5f, 173.f), NORMAL_VTX); // 2
+    // knifeA.add(glm::vec2(143.5f, 173.f), NORMAL_VTX); // 3
+    // knifeA.add(glm::vec2(131.5f, 129.f), NORMAL_VTX); // 10
+    // // triangle 4
+    // knifeA.add(glm::vec2(143.5f, 173.f), NORMAL_VTX); // 3
+    // knifeA.add(glm::vec2(143.5f, 129.f), NORMAL_VTX); // 9
+    // knifeA.add(glm::vec2(131.5f, 129.f), NORMAL_VTX); // 10
+    // // triangle 5
+    // knifeA.add(glm::vec2(143.5f, 164.5f), NORMAL_VTX); // 4
+    // knifeA.add(glm::vec2(220.5f, 164.5f), NORMAL_VTX); // 5
+    // knifeA.add(glm::vec2(143.5f, 137.5f), NORMAL_VTX); // 8
+    // // triangle 6
+    // knifeA.add(glm::vec2(220.5f, 164.5f), NORMAL_VTX); // 5
+    // knifeA.add(glm::vec2(220.5f, 137.5f), NORMAL_VTX); // 7
+    // knifeA.add(glm::vec2(143.5f, 137.5f), NORMAL_VTX); // 8
+    // // triangle 7
+    // knifeA.add(glm::vec2(220.5f, 164.5f), NORMAL_VTX); // 5
+    // knifeA.add(glm::vec2(244.f, 151.f), NORMAL_VTX);   // 6
+    // knifeA.add(glm::vec2(220.5f, 137.5f), NORMAL_VTX); // 7
+    // // when finish adding vertices, don't forget to call computeAabb()
+    // knifeA.computeAabb();
+    // // transform
+    // knifeA.translate(glm::vec2(-100.f, -25.f));
+    // knifeA.rotate(45.f);
+    // knifeA.scale(0.2f);
+    // // other properties
+    // knifeA.r = 0.616f;
+    // knifeA.g = 0.29f;
+    // knifeA.b = 0.663f;
+    // knifeA.v = glm::vec2(40.f, 40.f);
+    // knifeA.omega = 1.f;
 
     // polys.push_back(square);
     // polys.push_back(object2);
     // polys.push_back(object3);
-    polys.push_back(knifeA);
+    // polys.push_back(knifeA);
 
     return polys;
   }

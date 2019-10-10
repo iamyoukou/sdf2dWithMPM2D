@@ -84,6 +84,8 @@ Snow::Snow(const float inVp0, const float inMp, const Vector2f &inXp,
   // r = 1 - ((float)rand() / (RAND_MAX)) * 0.23f;
   s = 3.0f;
   r = 1.0f;
+  g = 1.0f;
+  b = 1.0f;
 }
 
 Snow::Snow(Particle p) : Particle(p.Vp0, p.Mp, p.Xp, p.Vp, p.Bp) {
@@ -314,7 +316,7 @@ void DrySand::DrawParticle() {
 //
 void Snow::DrawParticle() {
   glPointSize(s);
-  glColor3f(r, r, r);
+  glColor3f(r, g, b);
 
   glEnable(GL_POINT_SMOOTH);
   glBegin(GL_POINTS);

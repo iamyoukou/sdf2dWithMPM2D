@@ -22,6 +22,11 @@ void Polygon::add(glm::vec2 vtx, bool isSdf) {
     sdfVertices.push_back(vtx);
   } else {
     vertices.push_back(vtx);
+
+    // for convex, sdfVertices is same as vertices
+    if (isConvex) {
+      sdfVertices.push_back(vtx);
+    }
   }
 }
 
@@ -107,12 +112,18 @@ void Polygon::scale(float factor) {
 void Polygon::DrawPolygon() {
   glColor3f(r, g, b);
 
-  GLenum mode = isConvex ? GL_POLYGON : GL_TRIANGLES;
-
-  glBegin(mode);
-  for (size_t i = 0; i < vertices.size(); i++) {
-    glVertex2f(vertices[i].x, vertices[i].y);
+  if (isConvex) {
+    glBegin(GL_POLYGON);
+    for (size_t i = 0; i < vertices.size(); i++) {
+      glVertex2f(vertices[i].x, vertices[i].y);
+    }
+    glEnd();
+  } else {
+    glBegin(GL_TRIANGLES);
+    for (size_t i = 0; i < sdfVertices.size(); i++) {
+      glVertex2f(sdfVertices[i].x, sdfVertices[i].y);
+    }
+    glEnd();
   }
-  glEnd();
 }
 /* end Functions in class Polygon */

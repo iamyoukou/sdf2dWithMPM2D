@@ -160,7 +160,8 @@ public:
   float lam; // Lame parameters
   float mu;
 
-  float s, r; // size and color
+  float s;       // size
+  float r, g, b; // size and color
 
   /* Constructors */
   Snow() : Particle(){};
@@ -226,12 +227,13 @@ public:
     return (rand() % (up - down - 1) + down);
   }
 
+  // Generate point positions from image
   static std::vector<Vector2f> ptsFromImg(std::string name, Vector2f trans,
                                           Vector2f scale) {
     std::vector<Vector2f> ps;
     cv::Mat inImg = cv::imread(name);
 
-    int rndSize = 50;
+    int rndSize = 100; // resolution along each axis
     int imgWidth = inImg.size().width;
     int imgHeight = inImg.size().height;
 
