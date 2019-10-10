@@ -41,6 +41,8 @@ const static float sdfCellSize = H_INV;
 const static int sdfWidth = X_GRID;
 const static int sdfHeight = Y_GRID;
 const static float NARROW_BAND = 1.f;
+const static bool SDF_VTX = true;
+const static bool NORMAL_VTX = false;
 
 /* ----- TRANSFER ----- */
 #if INTERPOLATION == 1

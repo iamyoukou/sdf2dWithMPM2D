@@ -60,85 +60,72 @@ public:
     // object3.add(glm::vec2(284.5f, 139.f));
     // object3.computeAabb();
 
-    // Arrow A
-    Polygon arrowA;
-    arrowA.isConvex = false;
-    // When compute sdf, use the original convex, i.e. 12 vertices
-    arrowA.add(glm::vec2(91.5f, 150.f), true);   // 0
-    arrowA.add(glm::vec2(85.5f, 138.5f), true);  // 1
-    arrowA.add(glm::vec2(104.f, 138.5f), true);  // 2
-    arrowA.add(glm::vec2(109.5f, 148.5f), true); // 3
-    arrowA.add(glm::vec2(201.f, 148.5f), true);  // 4
-    arrowA.add(glm::vec2(201.f, 138.5f), true);  // 5
-    arrowA.add(glm::vec2(225.f, 150.f), true);   // 6
-    arrowA.add(glm::vec2(201.f, 163.f), true);   // 7
-    arrowA.add(glm::vec2(201.f, 151.5f), true);  // 8
-    arrowA.add(glm::vec2(109.5f, 151.5f), true); // 9
-    arrowA.add(glm::vec2(104.f, 162.f), true);   // 10
-    arrowA.add(glm::vec2(85.5f, 162.f), true);   // 11
+    // Knife A
+    Polygon knifeA;
+    knifeA.isConvex = false;
+    // vertices for sdf
+    // When compute sdf, use the original convex
+    knifeA.add(glm::vec2(68.5f, 161.f), SDF_VTX);   // 0
+    knifeA.add(glm::vec2(131.5f, 161.f), SDF_VTX);  // 1
+    knifeA.add(glm::vec2(131.5f, 173.f), SDF_VTX);  // 2
+    knifeA.add(glm::vec2(143.5f, 173.f), SDF_VTX);  // 3
+    knifeA.add(glm::vec2(143.5f, 164.5f), SDF_VTX); // 4
+    knifeA.add(glm::vec2(220.5f, 164.5f), SDF_VTX); // 5
+    knifeA.add(glm::vec2(244.f, 151.f), SDF_VTX);   // 6
+    knifeA.add(glm::vec2(220.5f, 137.5f), SDF_VTX); // 7
+    knifeA.add(glm::vec2(143.5f, 137.5f), SDF_VTX); // 8
+    knifeA.add(glm::vec2(143.5f, 129.f), SDF_VTX);  // 9
+    knifeA.add(glm::vec2(131.5f, 129.f), SDF_VTX);  // 10
+    knifeA.add(glm::vec2(131.5f, 141.f), SDF_VTX);  // 11
+    knifeA.add(glm::vec2(68.5f, 141.f), SDF_VTX);   // 12
+    // vertices for drawing
     // Since opengl cannot draw concaves,
     // I separate the polygon into several triangles
     // triangle 1
-    arrowA.add(glm::vec2(91.5f, 150.f), false);  // 0
-    arrowA.add(glm::vec2(85.5f, 138.5f), false); // 1
-    arrowA.add(glm::vec2(104.f, 138.5f), false); // 2
-    // triagnle 2
-    arrowA.add(glm::vec2(91.5f, 150.f), false);   // 0
-    arrowA.add(glm::vec2(104.f, 138.5f), false);  // 2
-    arrowA.add(glm::vec2(109.5f, 148.5f), false); // 3
+    knifeA.add(glm::vec2(68.5f, 161.f), NORMAL_VTX);  // 0
+    knifeA.add(glm::vec2(131.5f, 141.f), NORMAL_VTX); // 11
+    knifeA.add(glm::vec2(68.5f, 141.f), NORMAL_VTX);  // 12
+    // triangle 2
+    knifeA.add(glm::vec2(68.5f, 161.f), NORMAL_VTX);  // 0
+    knifeA.add(glm::vec2(131.5f, 161.f), NORMAL_VTX); // 1
+    knifeA.add(glm::vec2(131.5f, 141.f), NORMAL_VTX); // 11
     // triangle 3
-    arrowA.add(glm::vec2(91.5f, 150.f), false);   // 0
-    arrowA.add(glm::vec2(109.5f, 148.5f), false); // 3
-    arrowA.add(glm::vec2(109.5f, 151.5f), false); // 9
-    // triagnle 4
-    arrowA.add(glm::vec2(91.5f, 150.f), false);   // 0
-    arrowA.add(glm::vec2(109.5f, 151.5f), false); // 9
-    arrowA.add(glm::vec2(104.f, 162.f), false);   // 10
+    knifeA.add(glm::vec2(131.5f, 173.f), NORMAL_VTX); // 2
+    knifeA.add(glm::vec2(143.5f, 173.f), NORMAL_VTX); // 3
+    knifeA.add(glm::vec2(131.5f, 129.f), NORMAL_VTX); // 10
+    // triangle 4
+    knifeA.add(glm::vec2(143.5f, 173.f), NORMAL_VTX); // 3
+    knifeA.add(glm::vec2(143.5f, 129.f), NORMAL_VTX); // 9
+    knifeA.add(glm::vec2(131.5f, 129.f), NORMAL_VTX); // 10
     // triangle 5
-    arrowA.add(glm::vec2(91.5f, 150.f), false); // 0
-    arrowA.add(glm::vec2(104.f, 162.f), false); // 10
-    arrowA.add(glm::vec2(85.5f, 162.f), false); // 11
+    knifeA.add(glm::vec2(143.5f, 164.5f), NORMAL_VTX); // 4
+    knifeA.add(glm::vec2(220.5f, 164.5f), NORMAL_VTX); // 5
+    knifeA.add(glm::vec2(143.5f, 137.5f), NORMAL_VTX); // 8
     // triangle 6
-    arrowA.add(glm::vec2(109.5f, 148.5f), false); // 3
-    arrowA.add(glm::vec2(201.f, 151.5f), false);  // 8
-    arrowA.add(glm::vec2(109.5f, 151.5f), false); // 9
+    knifeA.add(glm::vec2(220.5f, 164.5f), NORMAL_VTX); // 5
+    knifeA.add(glm::vec2(220.5f, 137.5f), NORMAL_VTX); // 7
+    knifeA.add(glm::vec2(143.5f, 137.5f), NORMAL_VTX); // 8
     // triangle 7
-    arrowA.add(glm::vec2(109.5f, 148.5f), false); // 3
-    arrowA.add(glm::vec2(201.f, 148.5f), false);  // 4
-    arrowA.add(glm::vec2(201.f, 151.5f), false);  // 8
-    // triangle 8
-    arrowA.add(glm::vec2(201.f, 151.5f), false); // 8
-    arrowA.add(glm::vec2(225.f, 150.f), false);  // 6
-    arrowA.add(glm::vec2(201.f, 163.f), false);  // 7
-    // triangle 9
-    arrowA.add(glm::vec2(201.f, 148.5f), false); // 4
-    arrowA.add(glm::vec2(225.f, 150.f), false);  // 6
-    arrowA.add(glm::vec2(201.f, 151.5f), false); // 8
-    // triangle 10
-    arrowA.add(glm::vec2(201.f, 138.5f), false); // 5
-    arrowA.add(glm::vec2(225.f, 150.f), false);  // 6
-    arrowA.add(glm::vec2(201.f, 148.5f), false); // 4
+    knifeA.add(glm::vec2(220.5f, 164.5f), NORMAL_VTX); // 5
+    knifeA.add(glm::vec2(244.f, 151.f), NORMAL_VTX);   // 6
+    knifeA.add(glm::vec2(220.5f, 137.5f), NORMAL_VTX); // 7
     // when finish adding vertices, don't forget to call computeAabb()
-    arrowA.computeAabb();
+    knifeA.computeAabb();
     // transform
-    arrowA.translate(glm::vec2(0.f, -25.f));
-    arrowA.rotate(45.f);
-    arrowA.scale(0.375f);
+    knifeA.translate(glm::vec2(-100.f, -25.f));
+    knifeA.rotate(45.f);
+    knifeA.scale(0.2f);
     // other properties
-    arrowA.r = 0.616f;
-    arrowA.g = 0.29f;
-    arrowA.b = 0.663f;
-    arrowA.v = glm::vec2(0.f, 40.f);
-    arrowA.omega = 1.f;
-
-    // Arrow B
-
-    // Arrow C
+    knifeA.r = 0.616f;
+    knifeA.g = 0.29f;
+    knifeA.b = 0.663f;
+    knifeA.v = glm::vec2(0.f, 40.f);
+    knifeA.omega = 1.f;
 
     // polys.push_back(square);
     // polys.push_back(object2);
     // polys.push_back(object3);
-    polys.push_back(arrowA);
+    polys.push_back(knifeA);
 
     return polys;
   }
