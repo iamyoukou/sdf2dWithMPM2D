@@ -27,6 +27,56 @@ public:
   Particle(const float inVp0, const float inMp, const Vector2f &inXp,
            const Vector2f &inVp, const Matrix2f &inBp);
   ~Particle(){};
+
+  /* Static function */
+  static int myRand(int down, int up) {
+    return (rand() % (up - down - 1) + down);
+  }
+
+  // Generate point positions from image
+  static std::vector<Vector2f> ptsFromImg(std::string name, Vector2f trans,
+                                          Vector2f scale) {
+    std::vector<Vector2f> ps;
+    cv::Mat inImg = cv::imread(name);
+
+    int rndSize = 100; // resolution along each axis
+    int imgWidth = inImg.size().width;
+    int imgHeight = inImg.size().height;
+
+    for (int i = 0; i < rndSize; i++) {
+      for (int j = 0; j < rndSize; j++) {
+        int x, y;
+        x = myRand(0, imgWidth - 1);
+        y = myRand(0, imgHeight - 1);
+
+        cv::Vec3b pixelSrc = inImg.at<cv::Vec3b>(cv::Point(x, y));
+
+        int color = pixelSrc[0] + pixelSrc[1] + pixelSrc[2];
+        // some threshold
+        if (color < 10) {
+          Vector2f pos;
+
+          // rescale
+          float fx, fy;
+          fx = (float)x / (float)imgWidth; // to [0, 1.0]
+          fy = (float)y / (float)imgHeight;
+          fx *= scale[0];
+          fy *= scale[0];
+
+          // translate
+          fx += trans[0];
+          fy += trans[1];
+
+          // back to world space
+          pos = Vector2f(fx * (float)X_GRID, fy * (float)Y_GRID);
+
+          ps.push_back(pos);
+        }
+      } // end inner for
+    }   // end outer for
+
+    return ps;
+  } // end ptsFromImg
 };
 
 /* ----------------------------------------------------------------------------------------------
@@ -62,6 +112,17 @@ public:
   /* Static Functions */
   static std::vector<Water> InitializeParticles() {
     std::vector<Water> outParticles;
+    Vector2f v = Vector2f(30, 0); // Initial velocity
+    Matrix2f a = Matrix2f(0);
+
+    // get position from image
+    std::vector<Vector2f> heart =
+        ptsFromImg("heart.png", Vector2f(0.25f, 0.45f), Vector2f(0.5f, 0.5f));
+
+    for (int i = 0; i < heart.size(); i++) {
+      outParticles.push_back(Water(1.14f, 0.0005f, heart[i], v, a));
+    }
+
     return outParticles;
   }
 
@@ -222,56 +283,7 @@ public:
     std::vector<Snow> outParticles;
     return outParticles;
   }
-
-  static int myRand(int down, int up) {
-    return (rand() % (up - down - 1) + down);
-  }
-
-  // Generate point positions from image
-  static std::vector<Vector2f> ptsFromImg(std::string name, Vector2f trans,
-                                          Vector2f scale) {
-    std::vector<Vector2f> ps;
-    cv::Mat inImg = cv::imread(name);
-
-    int rndSize = 100; // resolution along each axis
-    int imgWidth = inImg.size().width;
-    int imgHeight = inImg.size().height;
-
-    for (int i = 0; i < rndSize; i++) {
-      for (int j = 0; j < rndSize; j++) {
-        int x, y;
-        x = myRand(0, imgWidth - 1);
-        y = myRand(0, imgHeight - 1);
-
-        cv::Vec3b pixelSrc = inImg.at<cv::Vec3b>(cv::Point(x, y));
-
-        int color = pixelSrc[0] + pixelSrc[1] + pixelSrc[2];
-        // some threshold
-        if (color < 10) {
-          Vector2f pos;
-
-          // rescale
-          float fx, fy;
-          fx = (float)x / (float)imgWidth; // to [0, 1.0]
-          fy = (float)y / (float)imgHeight;
-          fx *= scale[0];
-          fy *= scale[0];
-
-          // translate
-          fx += trans[0];
-          fy += trans[1];
-
-          // back to world space
-          pos = Vector2f(fx * (float)X_GRID, fy * (float)Y_GRID);
-
-          ps.push_back(pos);
-        }
-      } // end inner for
-    }   // end outer for
-
-    return ps;
-  } // end ptsFromImg
-};  // end class Snow
+}; // end class Snow
 
 /* ELASTIC */
 class Elastic : public Particle {

@@ -25,7 +25,7 @@ const static float DT = 0.0005f; // Time-step
 
 // Material
 // #define Material Elastic // [Water] - [DrySand] - [Snow] - [Elastic]
-#define Material Snow
+#define Material Water
 
 /* -----------------------------------------------------------------------
 |								CONSTANTS
