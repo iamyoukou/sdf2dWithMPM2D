@@ -1,10 +1,11 @@
 #include "solver.h"
 
 /* Constructors */
-Solver::Solver(const std::vector<Border> &inBorders,
-               const std::vector<Node> &inNodes,
-               const std::vector<Material> &inParticles,
-               const std::vector<Polygon> &inPolygons) {
+template <typename Type>
+Solver<Type>::Solver(const std::vector<Border> &inBorders,
+                     const std::vector<Node> &inNodes,
+                     const std::vector<Type> &inParticles,
+                     const std::vector<Polygon> &inPolygons) {
   borders = inBorders;
   nodes = inNodes;
   particles = inParticles;
@@ -20,7 +21,7 @@ Solver::Solver(const std::vector<Border> &inBorders,
 |			          Functions for computing sdf
 |
 ----------------------------------------------------------------------- */
-void Solver::computeSdf() {
+template <typename Type> void Solver<Type>::computeSdf() {
   // compute sdf for (sdfWidth * sdfHeight) world space points
   // the interval between two adjacent points is sdfCellSize
   for (int x = 0; x < sdfWidth; x++) {
@@ -58,7 +59,9 @@ void Solver::computeSdf() {
   }
 }
 
-bool Solver::intersect(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3, glm::vec2 p4) {
+template <typename Type>
+bool Solver<Type>::intersect(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3,
+                             glm::vec2 p4) {
   glm::vec3 a(p1, 0), b(p2, 0), c(p3, 0), d(p4, 0);
 
   float crossAcAb, crossAbAd, crossDaDc, crossDcDb;
@@ -74,7 +77,8 @@ bool Solver::intersect(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3, glm::vec2 p4) {
   }
 }
 
-bool Solver::inside_polygon(glm::vec2 p, Polygon &poly) {
+template <typename Type>
+bool Solver<Type>::inside_polygon(glm::vec2 p, Polygon &poly) {
   int count = 0;
   glm::vec2 q(1234567.f, 1234567.f); // a point at the infinity
   int len = poly.sdfVertices.size();
@@ -88,7 +92,8 @@ bool Solver::inside_polygon(glm::vec2 p, Polygon &poly) {
   return count % 2 == 1;
 }
 
-float Solver::nearest_distance(glm::vec2 p, Polygon &poly) {
+template <typename Type>
+float Solver<Type>::nearest_distance(glm::vec2 p, Polygon &poly) {
   float dist = 9999.f;
   int len = poly.sdfVertices.size();
 
@@ -116,7 +121,7 @@ float Solver::nearest_distance(glm::vec2 p, Polygon &poly) {
 }
 
 // p is world position
-float Solver::getDistance(glm::vec2 p) {
+template <typename Type> float Solver<Type>::getDistance(glm::vec2 p) {
 
   // world position to sdf index
   int idx_x, idx_y;
@@ -135,7 +140,7 @@ float Solver::getDistance(glm::vec2 p) {
 }
 
 // p is world position
-glm::vec2 Solver::getGradient(glm::vec2 p) {
+template <typename Type> glm::vec2 Solver<Type>::getGradient(glm::vec2 p) {
   glm::vec2 gd;
 
   // world position to sdf position
@@ -165,7 +170,7 @@ glm::vec2 Solver::getGradient(glm::vec2 p) {
 }
 
 // p is world position
-Polygon *Solver::getPolygon(glm::vec2 p) {
+template <typename Type> Polygon *Solver<Type>::getPolygon(glm::vec2 p) {
   // world position to sdf index
   int idx_x, idx_y;
   idx_x = int(glm::floor(p.x / sdfCellSize));
@@ -181,7 +186,7 @@ Polygon *Solver::getPolygon(glm::vec2 p) {
   }
 }
 
-void Solver::applySdfCollision(Node &node) {
+template <typename Type> void Solver<Type>::applySdfCollision(Node &node) {
   // node world space position
   glm::vec2 pos(node.Xi[0], node.Xi[1]);
   glm::vec2 v(node.Vi[0], node.Vi[1]);
@@ -264,7 +269,7 @@ void Solver::applySdfCollision(Node &node) {
 ----------------------------------------------------------------------- */
 
 // Transfer from Particles to Grid nodes
-void Solver::P2G() {
+template <typename Type> void Solver<Type>::P2G() {
   // plen is computed here for when we add particles mid-simulaion
   // If there is no need to add new particles during simulation,
   // write this line in constructors
@@ -320,7 +325,7 @@ void Solver::P2G() {
 }
 
 // Update node force and velocity
-void Solver::UpdateNodes() {
+template <typename Type> void Solver<Type>::UpdateNodes() {
 // Dynamic parallelization because not all the nodes are active
 #pragma omp parallel for schedule(dynamic)
   for (int i = 0; i < ilen; i++) {
@@ -345,7 +350,7 @@ void Solver::UpdateNodes() {
 }
 
 // Transfer from Grid nodes to Particles
-void Solver::G2P() {
+template <typename Type> void Solver<Type>::G2P() {
 #pragma omp parallel for
   for (int p = 0; p < plen; p++) {
     // Index of bottom-left node closest to the particle
@@ -376,7 +381,7 @@ void Solver::G2P() {
 }
 
 // Update particle deformation data and position
-void Solver::UpdateParticles() {
+template <typename Type> void Solver<Type>::UpdateParticles() {
 #pragma omp parallel for
   for (int p = 0; p < plen; p++) {
     // Index of bottom-left node closest to the particle
@@ -415,7 +420,7 @@ void Solver::UpdateParticles() {
 }
 
 // Reset active nodes data
-void Solver::ResetGrid() {
+template <typename Type> void Solver<Type>::ResetGrid() {
 #pragma omp parallel for schedule(dynamic)
   for (int i = 0; i < ilen; i++)
     if (nodes[i].Mi > 0)
@@ -426,7 +431,7 @@ void Solver::ResetGrid() {
 |								  OTHER
 |
 ----------------------------------------------------------------------- */
-void Solver::MovePolygons() {
+template <typename Type> void Solver<Type>::MovePolygons() {
   for (size_t i = 0; i < polylen; i++) {
     polygons[i].translate(DT * polygons[i].v);
   }
@@ -438,7 +443,7 @@ void Solver::MovePolygons() {
 ----------------------------------------------------------------------- */
 
 // Draw particles, border and nodes (if selected).
-void Solver::Draw() {
+template <typename Type> void Solver<Type>::Draw() {
   // Draw borders
   for (size_t b = 0; b < blen; b++) {
     borders[b].DrawBorder();

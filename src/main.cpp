@@ -1,4 +1,5 @@
 #include "solver.h"
+#include "solver.cpp"
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <iomanip>
@@ -10,10 +11,11 @@
 void initGLContext();
 GLFWwindow *initGLFWContext();
 void drawSdf(GLFWwindow *);
-Solver *Simulation;
+Solver<Snow> *SnowSolver;
+// *WaterSolver;
 int t_count = 0;
 int frameNumber = 0;
-bool mask1 = true, mask2 = true; // for animation controlling
+bool mask1 = true, mask2 = true, mask3 = true; // for animation controlling
 
 /* For video */
 void images2video() {
@@ -36,55 +38,77 @@ void images2video() {
 ----------------------------------------------------------------------- */
 
 void Initialization() {
+  // for snow solver
   std::vector<Border> inBorders = Border::InitializeBorders();
   std::vector<Node> inNodes = Node::InitializeNodes();
-  std::vector<Material> inParticles = Material::InitializeParticles();
+  std::vector<Snow> inParticles = Snow::InitializeParticles();
   std::vector<Polygon> inPolygons = Polygon::InitializePolygons();
 
-  Simulation = new Solver(inBorders, inNodes, inParticles, inPolygons);
+  SnowSolver = new Solver(inBorders, inNodes, inParticles, inPolygons);
+  SnowSolver->computeSdf(); // for static objects, compute only once
 
-  Simulation->computeSdf(); // for static objects, compute only once
+  // for water solver
+  // WaterSolver =
+  //     new Solver(inBorders, inNodes, Water::InitializeParticles(), NULL);
 }
 
 void Update() {
+  /* for snow solver */
   // for user-defined special effects
-  // if (frameNumber == 51 && mask1) {
-  //   Simulation->polygons[0].v = -Simulation->polygons[0].v;
-  //   mask1 = false;
-  // } else if (frameNumber == 76 && mask2) {
-  //   Simulation->polygons[0].v = glm::vec2(0.f, 0.f);
-  //   mask2 = false;
-  // }
+  if (frameNumber == 51 && mask1) {
+    SnowSolver->polygons[0].v = glm::vec2(0.f, 0.f);
+    // std::cout << glm::to_string(SnowSolver->polygons[0].vertices[6]) << '\n';
+    mask1 = false;
+  }
+  // stop the knife for a few frames
+  // then pull it out
+  else if (frameNumber == 81 && mask2) {
+    SnowSolver->polygons[0].v = glm::vec2(-40.f, -40.f);
+    mask2 = false;
+  }
+  // stop the knife again
+  else if (frameNumber == 121 && mask3) {
+    SnowSolver->polygons[0].v = glm::vec2(0.f, 0.f);
+    mask3 = false;
+  }
 
   // move objects
-  Simulation->MovePolygons();
-  // Simulation->computeSdf(); // for dynamic objects, update sdf every frame
+  SnowSolver->MovePolygons();
+  // SnowSolver->computeSdf(); // for dynamic objects, update sdf every frame
 
   // MPM steps
   // Transfer data from Particles to Grid Nodes
-  Simulation->P2G();
+  SnowSolver->P2G();
   // Update nodes data
-  Simulation->UpdateNodes();
+  SnowSolver->UpdateNodes();
   // Transfer data from Grid Nodes to Particles
-  Simulation->G2P();
+  SnowSolver->G2P();
   // Update particles data
-  Simulation->UpdateParticles();
+  SnowSolver->UpdateParticles();
+
+  /* for water solver */
+  // if (frameNumber == 81) {
+  //   WaterSolver->P2G();
+  //   WaterSolver->UpdateNodes();
+  //   WaterSolver->G2P();
+  //   WaterSolver->UpdateParticles();
+  // }
 }
 
 // Add particle during the simulation
 // If new particles are needed during simulation, use this method,
 // and modify the AddParticles() method in particle.h
-void AddParticles() {
-  // DT_ROB gives the rate of insertion. Maximum number of particles
-  if (t_count % DT_ROB == 0 && Simulation->particles.size() < 3000) {
-    // Create particles
-    std::vector<Material> new_p = Material::AddParticles();
-
-    // Add particles to solver
-    for (size_t p = 0; p < new_p.size(); p++)
-      Simulation->particles.push_back(new_p[p]);
-  }
-}
+// void AddParticles() {
+//   // DT_ROB gives the rate of insertion. Maximum number of particles
+//   if (t_count % DT_ROB == 0 && SnowSolver->particles.size() < 3000) {
+//     // Add water particles
+//     std::vector<Water> new_p = Water::AddParticles();
+//
+//     // Add particles to solver
+//     for (size_t p = 0; p < new_p.size(); p++)
+//       SnowSolver->particles.push_back(new_p[p]);
+//   }
+// }
 
 /* -----------------------------------------------------------------------
 |								MAIN
@@ -92,7 +116,7 @@ void AddParticles() {
 ----------------------------------------------------------------------- */
 
 int main(int argc, char **argv) {
-  /* Initialize Simulation */
+  /* Initialize SnowSolver */
   Initialization();
 
 /* [1] : output data to .ply file (to read in Houdini for example) */
@@ -102,8 +126,8 @@ int main(int argc, char **argv) {
     AddParticles();
     Update();
     if (t_count % (int)(DT_render / DT) == 0) // Record frame at desired
-      rate Simulation->WriteToFile(frame_count++);
-    Simulation->ResetGrid();
+      rate SnowSolver->WriteToFile(frame_count++);
+    SnowSolver->ResetGrid();
     t_count++;
   }
 
@@ -130,7 +154,10 @@ int main(int argc, char **argv) {
     // (DT_render / DT) time steps equal to one frame (counted by frameNumber)
     // By default, 1 frame = 66 time steps
     if (t_count % (int)(DT_render / DT) == 0) {
-      Simulation->Draw();
+      SnowSolver->Draw();
+
+      // if (frameNumber == 81)
+      //   WaterSolver->Draw();
 
       // for testing sdf
       // drawSdf(window);
@@ -165,7 +192,7 @@ int main(int argc, char **argv) {
     } // end outer if
 
     // Don't forget to reset grid every frame !!
-    Simulation->ResetGrid();
+    SnowSolver->ResetGrid();
 
     t_count++;
   } // end while
@@ -193,7 +220,7 @@ GLFWwindow *initGLFWContext() {
 
   /* Create Window*/
   GLFWwindow *window =
-      glfwCreateWindow(X_WINDOW, Y_WINDOW, "Simulation", NULL, NULL);
+      glfwCreateWindow(X_WINDOW, Y_WINDOW, "SnowSolver", NULL, NULL);
 
   if (!window) {
     glfwTerminate();
@@ -236,8 +263,8 @@ void drawSdf(GLFWwindow *wnd) {
   // for test
   // draw sdf gradient at a given point
   glm::vec2 start = glm::vec2(wx, wy);
-  float dist = Simulation->getDistance(start);
-  glm::vec2 grad = Simulation->getGradient(start);
+  float dist = SnowSolver->getDistance(start);
+  glm::vec2 grad = SnowSolver->getGradient(start);
   glm::vec2 end = start + dist * grad;
 
   glLineWidth(4);

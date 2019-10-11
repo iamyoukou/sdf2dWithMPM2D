@@ -112,15 +112,15 @@ public:
   /* Static Functions */
   static std::vector<Water> InitializeParticles() {
     std::vector<Water> outParticles;
-    Vector2f v = Vector2f(30, 0); // Initial velocity
+
+    Vector2f v = Vector2f(-40.f, -40.f); // Initial velocity
     Matrix2f a = Matrix2f(0);
 
-    // get position from image
-    std::vector<Vector2f> heart =
-        ptsFromImg("heart.png", Vector2f(0.25f, 0.45f), Vector2f(0.5f, 0.5f));
+    for (int p = 0; p < 8; p++) {
+      float r = ((float)rand() / (RAND_MAX)); // random number
 
-    for (int i = 0; i < heart.size(); i++) {
-      outParticles.push_back(Water(1.14f, 0.0005f, heart[i], v, a));
+      Vector2f pos = Vector2f(112.8f, 188.8f); // new positions
+      outParticles.push_back(Particle(1.14f, 0.0005f, pos, v, a));
     }
 
     return outParticles;
@@ -129,14 +129,13 @@ public:
   static std::vector<Water> AddParticles() // Add particle mid-simulation
   {
     std::vector<Water> outParticles;
-    Vector2f v = Vector2f(30, 0); // Initial velocity
+    Vector2f v = Vector2f(-40.f, -40.f); // Initial velocity
     Matrix2f a = Matrix2f(0);
 
     for (int p = 0; p < 8; p++) {
       float r = ((float)rand() / (RAND_MAX)); // random number
 
-      Vector2f pos = Vector2f(
-          (float)CUB, (float)(Y_GRID - 2 * CUB - 0.5 * p - r)); // new positions
+      Vector2f pos = Vector2f(112.8f, 188.8f); // new positions
       outParticles.push_back(Particle(1.14f, 0.0005f, pos, v, a));
     }
 
