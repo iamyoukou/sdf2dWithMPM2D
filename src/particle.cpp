@@ -276,19 +276,21 @@ void Water::DrawParticle() {
 
   float x = Vp.norm();
 
-  if (x / l_color < 1)
-    glColor3f((green[0] - blue[0]) / l_color * x + blue[0],
-              (green[1] - blue[1]) / l_color * x + blue[1],
-              (green[2] - blue[2]) / l_color * x + blue[2]);
-  else if (x / h_color < 1)
-    glColor3f((grey[0] - green[0]) / d_color * x + green[0] -
-                  l_color * (grey[0] - green[0]) / d_color,
-              (grey[1] - green[1]) / d_color * x + green[1] -
-                  l_color * (grey[1] - green[1]) / d_color,
-              (grey[2] - green[2]) / d_color * x + green[2] -
-                  l_color * (grey[2] - green[2]) / d_color);
-  else
-    glColor3f(grey[0], grey[1], grey[2]);
+  // if (x / l_color < 1)
+  //   glColor3f((green[0] - blue[0]) / l_color * x + blue[0],
+  //             (green[1] - blue[1]) / l_color * x + blue[1],
+  //             (green[2] - blue[2]) / l_color * x + blue[2]);
+  // else if (x / h_color < 1)
+  //   glColor3f((grey[0] - green[0]) / d_color * x + green[0] -
+  //                 l_color * (grey[0] - green[0]) / d_color,
+  //             (grey[1] - green[1]) / d_color * x + green[1] -
+  //                 l_color * (grey[1] - green[1]) / d_color,
+  //             (grey[2] - green[2]) / d_color * x + green[2] -
+  //                 l_color * (grey[2] - green[2]) / d_color);
+  // else
+  //   glColor3f(grey[0], grey[1], grey[2]);
+
+  glColor3f(0.87f, 0.07f, 0.1f);
 
   glEnable(GL_POINT_SMOOTH); // Round particles
   glBegin(GL_POINTS);

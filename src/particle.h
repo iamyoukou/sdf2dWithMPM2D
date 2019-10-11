@@ -113,15 +113,15 @@ public:
   static std::vector<Water> InitializeParticles() {
     std::vector<Water> outParticles;
 
-    Vector2f v = Vector2f(-40.f, -40.f); // Initial velocity
-    Matrix2f a = Matrix2f(0);
-
-    for (int p = 0; p < 8; p++) {
-      float r = ((float)rand() / (RAND_MAX)); // random number
-
-      Vector2f pos = Vector2f(112.8f, 188.8f); // new positions
-      outParticles.push_back(Particle(1.14f, 0.0005f, pos, v, a));
-    }
+    // Vector2f v = Vector2f(-40.f, -40.f); // Initial velocity
+    // Matrix2f a = Matrix2f(0);
+    //
+    // for (int p = 0; p < 8; p++) {
+    //   float r = ((float)rand() / (RAND_MAX)); // random number
+    //
+    //   Vector2f pos = Vector2f(112.8f, 188.8f); // new positions
+    //   outParticles.push_back(Particle(1.14f, 0.0005f, pos, v, a));
+    // }
 
     return outParticles;
   }
@@ -129,13 +129,19 @@ public:
   static std::vector<Water> AddParticles() // Add particle mid-simulation
   {
     std::vector<Water> outParticles;
-    Vector2f v = Vector2f(-40.f, -40.f); // Initial velocity
+
     Matrix2f a = Matrix2f(0);
 
-    for (int p = 0; p < 8; p++) {
+    for (int p = 0; p < 1; p++) {
+      float rndx = float(-myRand(0, 40));
+      float rndy = float(-myRand(0, 40));
+      Vector2f v = Vector2f(rndx, rndy); // Initial velocity
+
       float r = ((float)rand() / (RAND_MAX)); // random number
 
-      Vector2f pos = Vector2f(112.8f, 188.8f); // new positions
+      rndx = float(myRand(-5, 5));
+      rndy = float(myRand(-5, 5));
+      Vector2f pos = Vector2f(112.8f + rndx, 188.8f + rndy); // new positions
       outParticles.push_back(Particle(1.14f, 0.0005f, pos, v, a));
     }
 

@@ -135,4 +135,10 @@ public:
 
     return polys;
   }
+
+  static std::vector<Polygon> EmptyPolygons() {
+    std::vector<Polygon> polys;
+
+    return polys;
+  }
 }; // end class Polygon

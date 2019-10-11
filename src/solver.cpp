@@ -461,8 +461,9 @@ template <typename Type> void Solver<Type>::Draw() {
   // #endif
 
   // Draw particles
-  for (size_t p = 0; p < plen; p++)
+  for (size_t p = 0; p < plen; p++) {
     particles[p].DrawParticle();
+  }
 }
 
 // Write particle position to .ply file (used in Houdini for ex)
