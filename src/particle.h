@@ -8,6 +8,9 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtx/compatibility.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 /* The particle class contains data commun to all simulation.
 The material subclasses contains particular data and methods. */
@@ -21,6 +24,8 @@ public:
   Vector2f Xp; // Particle position
   Vector2f Vp; // Particle Velocity
   Matrix2f Bp; // ~ Particle velocity field
+
+  float t_life; // the lapsed time since a particle is created
 
   /* Constructors */
   Particle(){};
@@ -96,6 +101,8 @@ public:
   static float l_color;
   static float d_color;
 
+  static float blood[3];
+
   /* Constructors */
   Water() : Particle(){};
   Water(const float inVp0, const float inMp, const Vector2f &inXp,
@@ -126,22 +133,24 @@ public:
     return outParticles;
   }
 
-  static std::vector<Water> AddParticles() // Add particle mid-simulation
-  {
+  // Add particle mid-simulation
+  // Use frameNumber as a parameter to modify rndTheta
+  static std::vector<Water> AddParticles(int deg, int radius, int pNum) {
     std::vector<Water> outParticles;
 
     Matrix2f a = Matrix2f(0);
 
-    for (int p = 0; p < 1; p++) {
-      float rndx = float(-myRand(0, 40));
-      float rndy = float(-myRand(0, 40));
-      Vector2f v = Vector2f(rndx, rndy); // Initial velocity
+    float rndTheta = float(myRand(deg, 90)) * (3.1415f / 180.f); // radian
 
-      float r = ((float)rand() / (RAND_MAX)); // random number
+    for (int p = 0; p < pNum; p++) {
+      Vector2f v =
+          -Vector2f(glm::cos(rndTheta) * float(radius),
+                    glm::sin(rndTheta) * float(radius)); // Initial velocity
 
-      rndx = float(myRand(-5, 5));
-      rndy = float(myRand(-5, 5));
+      float rndx = float(myRand(-5, 5));
+      float rndy = float(myRand(-5, 5));
       Vector2f pos = Vector2f(112.8f + rndx, 188.8f + rndy); // new positions
+
       outParticles.push_back(Particle(1.14f, 0.0005f, pos, v, a));
     }
 

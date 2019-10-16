@@ -79,16 +79,17 @@ const static float DT_render = DT * 30.0f; // Rate of frame rendered (OpenGL)
 #define FRICTION true
 #endif
 
-const static Vector2f G = Vector2f(0.f, -9.8f); // Gravity
-// const static Vector2f G = Vector2f(0.0f, 0.f); // for test
-const static float CFRI = 0.3f; // Friction coefficient
+// const static Vector2f G = Vector2f(0.f, -9.8f); // Gravity
+const static Vector2f G = Vector2f(0.f, 0.f); // for test
+const static float CFRI = 0.3f;               // Friction coefficient
 
 /* Water */
 const static float RHO_water = 1.0f; // Density
 const static float K_water = 50.0f;  // Bulk Modulus
 const static int GAMMA_water = 3; // Penalize deviation form incompressibility
 
-const static int DT_ROB = 30; // Rate of AddParticle()
+// Rate of AddParticle()
+const static int DT_ROB = 30;
 
 /* Dry Sand */
 static const float RHO_dry_sand = 1600.0f; // Density

@@ -15,6 +15,8 @@ Solver<Type>::Solver(const std::vector<Border> &inBorders,
   ilen = nodes.size();
   plen = particles.size();
   polylen = polygons.size();
+
+  dt_rob = DT_ROB;
 }
 
 /* -----------------------------------------------------------------------
@@ -416,6 +418,9 @@ template <typename Type> void Solver<Type>::UpdateParticles() {
 
     // Update particle deformation gradient (elasticity, plasticity etc...)
     particles[p].UpdateDeformation(T);
+
+    // time lapsed for a particle
+    particles[p].t_life += 0.00001f;
   }
 }
 

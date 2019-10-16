@@ -1,5 +1,5 @@
 #include "solver.h"
-#include "solver.cpp"
+#include "solver.cpp" // to avoid template link error
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <iomanip>
@@ -17,6 +17,11 @@ int t_count = 0;
 int frameNumber = 0;
 bool mask1 = true, mask2 = true, mask3 = true; // for animation controlling
 bool startWater = false;
+
+// for create new particles
+int deg = 30;
+int radius = 40;
+int pNum = 8;
 
 /* For video */
 void images2video() {
@@ -46,7 +51,7 @@ void Initialization() {
   // // for snow solver
   // std::vector<Snow> inSnowParticles = Snow::InitializeParticles();
   // SnowSolver = new Solver(inBorders, inNodes, inSnowParticles, inPolygons);
-  // // for static objects, compute only once
+  // for static objects, compute only once
   // SnowSolver->computeSdf();
 
   // for water solver
@@ -56,16 +61,21 @@ void Initialization() {
 
 void Update() {
   /* for snow solver */
-  // for user-defined special effects
+  // // for user-defined special effects
   // if (frameNumber == 51 && mask1) {
   //   SnowSolver->polygons[0].v = glm::vec2(0.f, 0.f);
-  //   // std::cout << glm::to_string(SnowSolver->polygons[0].vertices[6]) <<
-  //   '\n'; mask1 = false;
+  //   mask1 = false;
   // }
   // // stop the knife for a few frames
   // // then pull it out
   // else if (frameNumber == 81 && mask2) {
   //   SnowSolver->polygons[0].v = glm::vec2(-40.f, -40.f);
+  //
+  //   // stop the movement of all particles
+  //   for (size_t i = 0; i < SnowSolver->plen; i++) {
+  //     SnowSolver->particles[i].Vp = Vector2f(0.f, 0.f);
+  //   }
+  //
   //   mask2 = false;
   // }
   // // stop the knife again
@@ -73,13 +83,15 @@ void Update() {
   //   SnowSolver->polygons[0].v = glm::vec2(0.f, 0.f);
   //   mask3 = false;
   // }
-
-  // move objects
+  //
+  // // move objects
   // SnowSolver->MovePolygons();
-  // SnowSolver->computeSdf(); // for dynamic objects, update sdf every frame
-
-  // MPM steps
-  // Transfer data from Particles to Grid Nodes
+  //
+  // // for dynamic objects, update sdf every frame
+  // SnowSolver->computeSdf();
+  //
+  // // MPM steps
+  // // Transfer data from Particles to Grid Nodes
   // SnowSolver->P2G();
   // // Update nodes data
   // SnowSolver->UpdateNodes();
@@ -87,6 +99,7 @@ void Update() {
   // SnowSolver->G2P();
   // // Update particles data
   // SnowSolver->UpdateParticles();
+  /* end for snow solver */
 
   /* for water solver */
   if (frameNumber == 5) {
@@ -95,9 +108,57 @@ void Update() {
 
   if (startWater) {
     // add water particles
-    if (t_count % DT_ROB == 0 && WaterSolver->particles.size() < 3000) {
+    if (t_count % WaterSolver->dt_rob == 0 &&
+        WaterSolver->particles.size() < 3000) {
+
+      // manually change parameters
+      if (frameNumber == 100) {
+        WaterSolver->dt_rob = DT_ROB * 2;
+        deg = 35;
+        radius = 35;
+        pNum = 7;
+      } else if (frameNumber == 150) {
+        WaterSolver->dt_rob = DT_ROB * 3;
+        deg = 40;
+        radius = 30;
+        pNum = 6;
+      } else if (frameNumber == 200) {
+        WaterSolver->dt_rob = DT_ROB * 4;
+        deg = 50;
+        radius = 25;
+        pNum = 5;
+      } else if (frameNumber == 250) {
+        WaterSolver->dt_rob = DT_ROB * 5;
+        deg = 60;
+        radius = 20;
+        pNum = 4;
+      } else if (frameNumber == 300) {
+        WaterSolver->dt_rob = DT_ROB * 6;
+        deg = 70;
+        radius = 15;
+        pNum = 3;
+      } else if (frameNumber == 350) {
+        WaterSolver->dt_rob = DT_ROB * 7;
+        deg = 80;
+        radius = 10;
+        pNum = 2;
+      } else if (frameNumber == 400) {
+        WaterSolver->dt_rob = DT_ROB * 8;
+        deg = 85;
+        radius = 10;
+        pNum = 1;
+      } else if (frameNumber == 450) {
+        WaterSolver->dt_rob = DT_ROB * 9;
+        deg = 85;
+        radius = 10;
+      } else if (frameNumber == 500) {
+        WaterSolver->dt_rob = DT_ROB * 10;
+        deg = 85;
+        radius = 10;
+      }
+
       // Add water particles
-      std::vector<Water> new_p = Water::AddParticles();
+      std::vector<Water> new_p = Water::AddParticles(deg, radius, pNum);
 
       // Add particles to solver
       for (size_t p = 0; p < new_p.size(); p++) {
@@ -113,9 +174,8 @@ void Update() {
       WaterSolver->G2P();
       WaterSolver->UpdateParticles();
     }
-
-    // std::cout << WaterSolver->particles.size() << '\n';
   }
+  /* end for water solver */
 }
 
 // Add particle during the simulation
@@ -156,7 +216,7 @@ int main(int argc, char **argv) {
 
 #else
   /* [2] : show result on OpenGL window, and record an .mp4 if selected */
-  const int frameLimit = 99999;
+  const int frameLimit = 500;
 
   GLFWwindow *window = initGLFWContext();
   initGLContext();
@@ -180,8 +240,8 @@ int main(int argc, char **argv) {
       // SnowSolver->Draw();
 
       // if (frameNumber == 81)
-      if (WaterSolver->particles.size() > 0)
-        WaterSolver->Draw();
+      // if (WaterSolver->particles.size() > 0)
+      WaterSolver->Draw();
 
       // for testing sdf
       // drawSdf(window);

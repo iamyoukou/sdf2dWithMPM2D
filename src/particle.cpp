@@ -9,6 +9,8 @@ Particle::Particle(const float inVp0, const float inMp, const Vector2f &inXp,
   Xp = inXp;
   Vp = inVp;
   Bp = inBp;
+
+  t_life = 0.f;
 }
 
 /* ----------------------------------------------------------------------------------------------
@@ -270,9 +272,10 @@ float Water::blue[3] = {0.3f, 0.7f, 1.0f};
 float Water::h_color = 40.0f;
 float Water::l_color = 20.0f;
 float Water::d_color = h_color - l_color;
+float Water::blood[3] = {0.78f, 0.01f, 0.01f};
 
 void Water::DrawParticle() {
-  glPointSize(12);
+  glPointSize(10);
 
   float x = Vp.norm();
 
@@ -289,8 +292,9 @@ void Water::DrawParticle() {
   //                 l_color * (grey[2] - green[2]) / d_color);
   // else
   //   glColor3f(grey[0], grey[1], grey[2]);
-
-  glColor3f(0.87f, 0.07f, 0.1f);
+  float temp = blood[0] - t_life;
+  float delta_r = (temp < 0.31f) ? 0.31f : temp;
+  glColor3f(delta_r, blood[1], blood[2]);
 
   glEnable(GL_POINT_SMOOTH); // Round particles
   glBegin(GL_POINTS);

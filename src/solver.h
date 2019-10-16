@@ -20,6 +20,8 @@ public:
   std::vector<Polygon> polygons;
 
   size_t ilen, blen, plen, polylen;
+  int type;   // particle type;
+  int dt_rob; // use to dynamically modify the rate of AddParticle()
 
   /* Constructors */
   Solver(){};
