@@ -219,18 +219,15 @@ template <typename Type> void Solver<Type>::applySdfCollision(Node &node) {
     glm::vec2 vlin = co->v;
 
     // rotational
-    // vec2 center = (co->lb + co->rt) * 0.5f;
-    // vec2 r = pos - center;
-    //
-    // vec2 vrot;
-    // vrot.x = -r.y / length(r);
-    // vrot.y = r.x / length(r);
-    glm::vec2 vrot(0.f, 0.f);
+    glm::vec2 center = (co->lb + co->rt) * 0.5f;
+    glm::vec2 r = pos - center;
 
-    // for visualization convenience
-    // float scale = 0.1f;
+    glm::vec2 vrot;
+    vrot.x = -r.y / length(r);
+    vrot.y = r.x / length(r);
+    // glm::vec2 vrot(0.f, 0.f);
 
-    // vrot *= co->omega * length(r) * scale;
+    vrot *= co->omega * length(r);
 
     vco = vlin + vrot;
 
@@ -421,6 +418,19 @@ template <typename Type> void Solver<Type>::UpdateParticles() {
 
     // time lapsed for a particle
     particles[p].t_life += 0.00001f;
+
+    // if a particle has moved into an object
+    // push it out
+    glm::vec2 pos = glm::vec2(particles[p].Xp[0], particles[p].Xp[1]);
+    float newDist = getDistance(pos);
+    if (newDist < 0.f) {
+      newDist *= 2.f; // for visualization convenience
+      glm::vec2 newGrad = getGradient(pos);
+      pos += newDist * newGrad;
+
+      particles[p].Xp[0] = pos.x;
+      particles[p].Xp[1] = pos.y;
+    }
   }
 }
 
@@ -439,6 +449,7 @@ template <typename Type> void Solver<Type>::ResetGrid() {
 template <typename Type> void Solver<Type>::MovePolygons() {
   for (size_t i = 0; i < polylen; i++) {
     polygons[i].translate(DT * polygons[i].v);
+    polygons[i].rotate(polygons[i].omega);
   }
 }
 

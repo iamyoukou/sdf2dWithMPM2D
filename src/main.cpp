@@ -57,6 +57,7 @@ void Initialization() {
   // for water solver
   std::vector<Water> inWaterParticles = Water::InitializeParticles();
   WaterSolver = new Solver(inBorders, inNodes, inWaterParticles, inPolygons);
+  WaterSolver->computeSdf();
 }
 
 void Update() {
@@ -102,14 +103,17 @@ void Update() {
   /* end for snow solver */
 
   /* for water solver */
-  if (frameNumber == 5) {
+  if (frameNumber == 1) {
     startWater = true;
   }
 
   if (startWater) {
+    WaterSolver->MovePolygons();
+    WaterSolver->computeSdf();
+
     // add water particles
     if (t_count % WaterSolver->dt_rob == 0 &&
-        WaterSolver->particles.size() < 3000) {
+        WaterSolver->particles.size() < 1000) {
 
       // manually change parameters
       if (frameNumber == 100) {

@@ -271,8 +271,8 @@ public:
     Matrix2f a = Matrix2f(0);
 
     // get position from image
-    std::vector<Vector2f> heart =
-        ptsFromImg("heart.png", Vector2f(0.25f, 0.45f), Vector2f(0.5f, 0.5f));
+    std::vector<Vector2f> heart = ptsFromImg(
+        "../image/heart.png", Vector2f(0.25f, 0.45f), Vector2f(0.5f, 0.5f));
 
     for (int i = 0; i < heart.size(); i++) {
       outParticles.push_back(Snow(VOL, MASS, heart[i], v, a));
