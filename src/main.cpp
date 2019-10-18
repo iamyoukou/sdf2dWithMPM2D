@@ -30,7 +30,7 @@ void images2video() {
   // so I just start from the third frame
   std::string command =
       "ffmpeg -r 60 -start_number 2 -i ../result/sim%04d.png -vcodec mpeg4 "
-      "-b 20M -s 600x600 ./result.mp4";
+      "-b 20M -s 600x600 ../video/result.mp4";
   system(command.c_str());
 
   // remove images
@@ -234,6 +234,7 @@ int main(int argc, char **argv) {
     // AddParticles();
 
     // P2G, compute grid forces, etc.
+    // std::cout << "t_count = " << t_count << '\n';
     Update();
 
     // Display frame at desired rate

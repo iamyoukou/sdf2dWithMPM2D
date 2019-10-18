@@ -110,7 +110,7 @@ public:
     fan.add(glm::vec2(55.7f, 48.6f), NORMAL_VTX); // 6
     fan.computeAabb();
     // transform
-    fan.translate(glm::vec2(75.f, 75.f));
+    fan.translate(glm::vec2(40.f, 140.f));
     fan.scale(1.5f);
     fan.rotate(45.f);
     // other properties
@@ -118,7 +118,7 @@ public:
     fan.g = 0.29f;
     fan.b = 0.663f;
     fan.v = glm::vec2(0.f, 0.f);
-    fan.omega = 0.01f;
+    fan.omega = 0.f;
 
     // // Knife A
     // Polygon knifeA;

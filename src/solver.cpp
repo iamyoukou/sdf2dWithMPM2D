@@ -188,10 +188,10 @@ template <typename Type> Polygon *Solver<Type>::getPolygon(glm::vec2 p) {
   }
 }
 
-template <typename Type> void Solver<Type>::applySdfCollision(Node &node) {
-  // node world space position
-  glm::vec2 pos(node.Xi[0], node.Xi[1]);
-  glm::vec2 v(node.Vi[0], node.Vi[1]);
+template <typename Type> void Solver<Type>::applySdfCollision(Type &p) {
+  // particle world space position
+  glm::vec2 pos(p.Xp[0], p.Xp[1]);
+  glm::vec2 v(p.Vp[0], p.Vp[1]);
 
   // std::cout << glm::to_string(pos) << '\n';
 
@@ -220,7 +220,10 @@ template <typename Type> void Solver<Type>::applySdfCollision(Node &node) {
 
     // rotational
     glm::vec2 center = (co->lb + co->rt) * 0.5f;
+
+    // radius vector
     glm::vec2 r = pos - center;
+    glm::vec2 dir_r = glm::normalize(r);
 
     glm::vec2 vrot;
     vrot.x = -r.y / length(r);
@@ -235,10 +238,40 @@ template <typename Type> void Solver<Type>::applySdfCollision(Node &node) {
     glm::vec2 vrel = v - vco;
 
     float vnLength = glm::dot(n, vrel);
-    // std::cout << vnLength << ", " << isCollisionOn << '\n';
 
-    // if not separating
+    // if not separating (i.e. not leaving from a surface)
+    // (?) not vnLength < 0.f, but vnLength < someThreshold will be better
+    // because vnLength may be very close to 0
     if (vnLength < 0.f && isCollisionOn) {
+      // std::cout << "n = " << glm::to_string(n) << '\n';
+      // std::cout << "vrel = " << glm::to_string(vrel) << '\n';
+      // std::cout << "vnLength = " << vnLength << '\n';
+      // std::cout << "dir_r = " << glm::to_string(dir_r) << '\n';
+
+      // polygon velocity change
+      // fixed position , so only rotational change
+      glm::vec2 g(G[0], G[1]);
+      glm::vec2 vpoly_tang = glm::dot(g, dir_r) * dir_r;
+      glm::vec2 vpoly_perp = g - vpoly_tang;
+
+      // std::cout << "vpoly_tang = " << glm::to_string(vpoly_tang) << '\n';
+      // std::cout << "vpoly_perp = " << glm::to_string(vpoly_perp) << '\n';
+
+      glm::vec3 temp =
+          glm::cross(glm::vec3(dir_r, 0.f), glm::vec3(vpoly_perp, 0.f));
+      float sign = (temp.z > 0) ? 1.f : -1.f;
+
+      float delta_omega = sign * glm::length(vpoly_perp) * p.Mp;
+      delta_omega *= 0.0001f;
+      // std::cout << "delta_omega = " << delta_omega << '\n';
+
+      if (glm::abs(co->omega) < 0.02f) {
+        co->omega += delta_omega;
+      }
+      // std::cout << "omega = " << co->omega << '\n';
+      // std::cout << '\n';
+
+      // particle velocity change
       glm::vec2 vt = vrel - vnLength * n;
       float mu = 0.55f;
 
@@ -253,8 +286,8 @@ template <typename Type> void Solver<Type>::applySdfCollision(Node &node) {
 
       // std::cout << v.x << ", " << v.y << '\n';
 
-      node.Vi[0] = v.x;
-      node.Vi[1] = v.y;
+      p.Vp[0] = v.x;
+      p.Vp[1] = v.y;
 
       // std::cout << "node velocity: " << node.Vi[0] << ", " << node.Vi[1]
       //           << '\n';
@@ -336,7 +369,7 @@ template <typename Type> void Solver<Type>::UpdateNodes() {
       nodes[i].Vi += nodes[i].Fi;
 
       // Apply collisions and frictions
-      applySdfCollision(nodes[i]); // sdf-based
+      // applySdfCollision(nodes[i]); // sdf-based
 
       nodes[i].NodeCollisions(); // borders
 #if FRICTION
@@ -382,6 +415,7 @@ template <typename Type> void Solver<Type>::G2P() {
 // Update particle deformation data and position
 template <typename Type> void Solver<Type>::UpdateParticles() {
 #pragma omp parallel for
+  // iterate all particles
   for (int p = 0; p < plen; p++) {
     // Index of bottom-left node closest to the particle
     int node_base = (X_GRID + 1) * static_cast<int>(particles[p].Xp[1] -
@@ -419,6 +453,9 @@ template <typename Type> void Solver<Type>::UpdateParticles() {
     // time lapsed for a particle
     particles[p].t_life += 0.00001f;
 
+    // sdf-based collision detection
+    applySdfCollision(particles[p]);
+
     // if a particle has moved into an object
     // push it out
     glm::vec2 pos = glm::vec2(particles[p].Xp[0], particles[p].Xp[1]);
@@ -431,7 +468,7 @@ template <typename Type> void Solver<Type>::UpdateParticles() {
       particles[p].Xp[0] = pos.x;
       particles[p].Xp[1] = pos.y;
     }
-  }
+  } // end  iterate particles
 }
 
 // Reset active nodes data

@@ -47,7 +47,7 @@ public:
   float getDistance(glm::vec2);
   glm::vec2 getGradient(glm::vec2);
   Polygon *getPolygon(glm::vec2);
-  void applySdfCollision(Node &);
+  void applySdfCollision(Type &);
 
   void Draw(); // Draw particles, border and nodes (if selected)
   void WriteToFile(
