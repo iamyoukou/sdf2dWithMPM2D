@@ -11,6 +11,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/compatibility.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 
 /* The particle class contains data commun to all simulation.
 The material subclasses contains particular data and methods. */
@@ -40,11 +41,11 @@ public:
 
   // Generate point positions from image
   static std::vector<Vector2f> ptsFromImg(std::string name, Vector2f trans,
-                                          Vector2f scale) {
+                                          Vector2f scale, float theta) {
     std::vector<Vector2f> ps;
     cv::Mat inImg = cv::imread(name);
 
-    int rndSize = 100; // resolution along each axis
+    int rndSize = 200; // resolution along each axis
     int imgWidth = inImg.size().width;
     int imgHeight = inImg.size().height;
 
@@ -61,10 +62,22 @@ public:
         if (color < 10) {
           Vector2f pos;
 
-          // rescale
           float fx, fy;
           fx = (float)x / (float)imgWidth; // to [0, 1.0]
           fy = (float)y / (float)imgHeight;
+
+          // rotate
+          float rx, ry;
+          float rad = 3.1415f / 180.f * theta;
+          // glm::vec2 rt = glm::rotate(glm::vec2(fx, fy), rad);
+          // fx = rt.x;
+          // fy = rt.y;
+          rx = glm::cos(rad) * fx - glm::sin(rad) * fy;
+          ry = glm::sin(rad) * fx + glm::cos(rad) * fy;
+          fx = rx;
+          fy = ry;
+
+          // rescale
           fx *= scale[0];
           fy *= scale[0];
 
@@ -101,8 +114,6 @@ public:
   static float l_color;
   static float d_color;
 
-  static float blood[3];
-
   /* Constructors */
   Water() : Particle(){};
   Water(const float inVp0, const float inMp, const Vector2f &inXp,
@@ -120,14 +131,15 @@ public:
   static std::vector<Water> InitializeParticles() {
     std::vector<Water> outParticles;
 
-    // Vector2f v = Vector2f(-40.f, -40.f); // Initial velocity
+    // Vector2f v = Vector2f(0.f, 0.f); // Initial velocity
     // Matrix2f a = Matrix2f(0);
     //
-    // for (int p = 0; p < 8; p++) {
-    //   float r = ((float)rand() / (RAND_MAX)); // random number
+    // // get position from image
+    // std::vector<Vector2f> pts = ptsFromImg(
+    //     "../image/wo.png", Vector2f(0.1f, 0.45f), Vector2f(0.5, 0.5), 30.f);
     //
-    //   Vector2f pos = Vector2f(112.8f, 188.8f); // new positions
-    //   outParticles.push_back(Particle(1.14f, 0.0005f, pos, v, a));
+    // for (int i = 0; i < pts.size(); i++) {
+    //   outParticles.push_back(Water(1.14f, 0.0005f, pts[i], v, a));
     // }
 
     return outParticles;
@@ -144,12 +156,12 @@ public:
 
     for (int p = 0; p < pNum; p++) {
       Vector2f v =
-          -Vector2f(glm::cos(rndTheta) * float(radius),
-                    glm::sin(rndTheta) * float(radius)); // Initial velocity
+          Vector2f(glm::cos(rndTheta) * float(radius),
+                   -glm::sin(rndTheta) * float(radius)); // Initial velocity
 
       float rndx = float(myRand(-5, 5));
       float rndy = float(myRand(-5, 5));
-      Vector2f pos = Vector2f(112.8f + rndx, 188.8f + rndy); // new positions
+      Vector2f pos = Vector2f(110.f + rndx, 187.f + rndy); // new positions
 
       outParticles.push_back(Particle(1.14f, 0.0005f, pos, v, a));
     }
@@ -190,10 +202,17 @@ public:
   /* Static Functions */
   static std::vector<DrySand> InitializeParticles() {
     std::vector<DrySand> outParticles;
-    DefaultPRNG PRNG;
+    // DefaultPRNG PRNG;
 
-    std::vector<sPoint> P_c = GeneratePoissonPoints(2000, PRNG);
-    int NP = static_cast<int>(P_c.size());
+    // std::vector<sPoint> P_c = GeneratePoissonPoints(2000, PRNG);
+
+    Vector2f v = Vector2f(0); // Initial velocity
+    Matrix2f a = Matrix2f(0);
+
+    std::vector<Vector2f> pts = ptsFromImg(
+        "../image/dai.png", Vector2f(0.f, 0.65f), Vector2f(0.5f, 0.5f), -30.f);
+
+    int NP = static_cast<int>(pts.size());
 
     float W_COL = X_GRID / 8.0f;
     float H_COL = (Y_GRID - 2 * CUB) * 0.9f;
@@ -203,13 +222,10 @@ public:
     float VOL = W_COL * H_COL / static_cast<float>(NP);
     float MASS = VOL * RHO_dry_sand / 100.0f;
 
-    Vector2f v = Vector2f(0); // Initial velocity
-    Matrix2f a = Matrix2f(0);
-
-    for (int p = 0; p < NP; p++) {
-      Vector2f pos =
-          Vector2f(P_c[p].x * W_COL + X_COL, P_c[p].y * H_COL + Y_COL);
-      outParticles.push_back(DrySand(VOL, MASS, pos, v, a));
+    for (int i = 0; i < pts.size(); i++) {
+      // Vector2f pos =
+      //     Vector2f(P_c[p].x * W_COL + X_COL, P_c[p].y * H_COL + Y_COL);
+      outParticles.push_back(DrySand(VOL, MASS, pts[i], v, a));
     }
 
     return outParticles;
@@ -255,10 +271,16 @@ public:
   /* Static Functions */
   static std::vector<Snow> InitializeParticles() {
     std::vector<Snow> outParticles;
-    DefaultPRNG PRNG;
 
-    std::vector<sPoint> P_c = GeneratePoissonPoints(3000, PRNG, 30, true);
-    int NP = static_cast<int>(P_c.size());
+    // get position from image
+    std::vector<Vector2f> pts =
+        ptsFromImg("../image/men.png", Vector2f(0.25f, 0.45f),
+                   Vector2f(0.5f, 0.5f), -30.f);
+
+    // DefaultPRNG PRNG;
+    //
+    // std::vector<sPoint> P_c = GeneratePoissonPoints(3000, PRNG, 30, true);
+    int NP = static_cast<int>(pts.size());
 
     float R_BALL = fmin(float(X_GRID), float(Y_GRID)) * 0.33f;
     float X_BALL = X_GRID * 0.3f;
@@ -267,15 +289,11 @@ public:
     float VOL = 2 * PI * R_BALL * R_BALL / static_cast<float>(NP);
     float MASS = VOL * RHO_snow / 100.0f;
 
-    Vector2f v = Vector2f(0.f, G[1] * 10.f); // Initial velocity
+    Vector2f v = Vector2f(0.f, 0.f); // Initial velocity
     Matrix2f a = Matrix2f(0);
 
-    // get position from image
-    std::vector<Vector2f> heart = ptsFromImg(
-        "../image/heart.png", Vector2f(0.25f, 0.45f), Vector2f(0.5f, 0.5f));
-
-    for (int i = 0; i < heart.size(); i++) {
-      outParticles.push_back(Snow(VOL, MASS, heart[i], v, a));
+    for (int i = 0; i < pts.size(); i++) {
+      outParticles.push_back(Snow(VOL, MASS, pts[i], v, a));
     }
 
     // for (int p = 0; p < NP; p++) {
@@ -326,35 +344,54 @@ public:
   static std::vector<Elastic> InitializeParticles() {
     std::vector<Elastic> outParticles;
 
-    std::vector<Vector2f> positions; // Create cube point cloud
-    for (float i = 0; i < fmax(X_GRID, Y_GRID) / 8.0f; i++)
-      for (float j = 0; j < fmax(X_GRID, Y_GRID) / 8.0f; j++)
-        positions.push_back(Vector2f(i, j));
+    std::vector<Vector2f> pts = ptsFromImg(
+        "../image/ni.png", Vector2f(0.45f, 0.45f), Vector2f(0.5f, 0.5f), 30.f);
+
+    // Create cube point cloud
+    // std::vector<Vector2f> positions;
+    // for (float i = 0; i < fmax(X_GRID, Y_GRID) / 8.0f; i++)
+    //   for (float j = 0; j < fmax(X_GRID, Y_GRID) / 8.0f; j++)
+    //     positions.push_back(Vector2f(i, j));
 
     float VOL =
         (float)fmax(X_GRID, Y_GRID) * (float)fmax(X_GRID, Y_GRID) / 16.0f;
     float MASS = VOL * RHO_elastic / 100.0f;
 
-    Vector2f v = Vector2f(30, 0); // Initial velocity
+    Vector2f v = Vector2f(0, 0); // Initial velocity
     Matrix2f a = Matrix2f(0);
 
-    for (size_t p = 0, plen = positions.size(); p < plen; p++) { // 1st cube
-      Vector2f pos = Vector2f(positions[p][0] + X_GRID * 0.1f,
-                              positions[p][1] + Y_GRID / 3.0f);
-      outParticles.push_back(Elastic(VOL, MASS, pos, v, a, LAM_elastic * 0.1f,
-                                     MU_elastic * 0.1f, 1, 0, 0));
-    }
-    for (size_t p = 0, plen = positions.size(); p < plen; p++) { // 2nd cube
-      Vector2f pos = Vector2f(positions[p][0] + X_GRID * 0.325f,
-                              positions[p][1] + Y_GRID / 2.0f);
-      outParticles.push_back(
-          Elastic(VOL, MASS, pos, v, a, LAM_elastic, MU_elastic, 0, 0, 1));
-    }
-    for (size_t p = 0, plen = positions.size(); p < plen; p++) { // 3rd cube
-      Vector2f pos = Vector2f(positions[p][0] + X_GRID * 0.55f,
-                              positions[p][1] + Y_GRID * 2 / 3.0f);
-      outParticles.push_back(Elastic(VOL, MASS, pos, v, a, 100 * LAM_elastic,
-                                     100 * MU_elastic, 0, 1, 0));
+    // for (size_t p = 0, plen = positions.size(); p < plen; p++) { // 1st cube
+    //   Vector2f pos = Vector2f(positions[p][0] + X_GRID * 0.1f,
+    //                           positions[p][1] + Y_GRID / 3.0f);
+    //   outParticles.push_back(Elastic(VOL, MASS, pos, v, a, LAM_elastic *
+    //   0.1f,
+    //                                  MU_elastic * 0.1f, 1, 0, 0));
+    // }
+    // for (size_t p = 0, plen = positions.size(); p < plen; p++) { // 2nd cube
+    //   Vector2f pos = Vector2f(positions[p][0] + X_GRID * 0.325f,
+    //                           positions[p][1] + Y_GRID / 2.0f);
+    //   outParticles.push_back(
+    //       Elastic(VOL, MASS, pos, v, a, LAM_elastic, MU_elastic, 0, 0, 1));
+    // }
+    // for (size_t p = 0, plen = positions.size(); p < plen; p++) { // 3rd cube
+    //   Vector2f pos = Vector2f(positions[p][0] + X_GRID * 0.55f,
+    //                           positions[p][1] + Y_GRID * 2 / 3.0f);
+    //   outParticles.push_back(Elastic(VOL, MASS, pos, v, a, 100 * LAM_elastic,
+    //                                  100 * MU_elastic, 0, 1, 0));
+    // }
+    for (int i = 0; i < pts.size(); i++) {
+      int ir, ig, ib;
+      ir = 50;
+      ig = myRand(150, 170);
+      ib = 50;
+
+      float fr, fg, fb;
+      fr = float(ir) / 255.f;
+      fg = float(ig) / 255.f;
+      fb = float(ib) / 255.f;
+
+      outParticles.push_back(Elastic(VOL, MASS, pts[i], v, a, 100 * LAM_elastic,
+                                     100 * MU_elastic, fr, fg, fb));
     }
 
     return outParticles;

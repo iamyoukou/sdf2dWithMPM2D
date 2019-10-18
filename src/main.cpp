@@ -13,6 +13,8 @@ GLFWwindow *initGLFWContext();
 void drawSdf(GLFWwindow *);
 Solver<Snow> *SnowSolver;
 Solver<Water> *WaterSolver;
+Solver<DrySand> *SandSolver;
+Solver<Elastic> *ElasticSolver;
 int t_count = 0;
 int frameNumber = 0;
 bool mask1 = true, mask2 = true, mask3 = true; // for animation controlling
@@ -51,13 +53,23 @@ void Initialization() {
   // // for snow solver
   // std::vector<Snow> inSnowParticles = Snow::InitializeParticles();
   // SnowSolver = new Solver(inBorders, inNodes, inSnowParticles, inPolygons);
-  // for static objects, compute only once
   // SnowSolver->computeSdf();
 
   // for water solver
   std::vector<Water> inWaterParticles = Water::InitializeParticles();
   WaterSolver = new Solver(inBorders, inNodes, inWaterParticles, inPolygons);
   WaterSolver->computeSdf();
+
+  // for sand
+  // std::vector<DrySand> inSandParticles = DrySand::InitializeParticles();
+  // SandSolver = new Solver(inBorders, inNodes, inSandParticles, inPolygons);
+  // SandSolver->computeSdf();
+
+  // for elastic
+  // std::vector<Elastic> inElasticParticles = Elastic::InitializeParticles();
+  // ElasticSolver =
+  //     new Solver(inBorders, inNodes, inElasticParticles, inPolygons);
+  // ElasticSolver->computeSdf();
 }
 
 void Update() {
@@ -109,11 +121,11 @@ void Update() {
 
   if (startWater) {
     WaterSolver->MovePolygons();
-    WaterSolver->computeSdf();
+    // WaterSolver->computeSdf();
 
     // add water particles
     if (t_count % WaterSolver->dt_rob == 0 &&
-        WaterSolver->particles.size() < 1000) {
+        WaterSolver->particles.size() < 5000) {
 
       // manually change parameters
       if (frameNumber == 100) {
@@ -180,6 +192,24 @@ void Update() {
     }
   }
   /* end for water solver */
+
+  // water
+  // WaterSolver->P2G();
+  // WaterSolver->UpdateNodes();
+  // WaterSolver->G2P();
+  // WaterSolver->UpdateParticles();
+
+  // sand
+  // SandSolver->P2G();
+  // SandSolver->UpdateNodes();
+  // SandSolver->G2P();
+  // SandSolver->UpdateParticles();
+
+  // Elastic
+  // ElasticSolver->P2G();
+  // ElasticSolver->UpdateNodes();
+  // ElasticSolver->G2P();
+  // ElasticSolver->UpdateParticles();
 }
 
 // Add particle during the simulation
@@ -248,6 +278,10 @@ int main(int argc, char **argv) {
       // if (WaterSolver->particles.size() > 0)
       WaterSolver->Draw();
 
+      // SandSolver->Draw();
+
+      // ElasticSolver->Draw();
+
       // for testing sdf
       // drawSdf(window);
 
@@ -283,6 +317,8 @@ int main(int argc, char **argv) {
     // Don't forget to reset grid every frame !!
     // SnowSolver->ResetGrid();
     WaterSolver->ResetGrid();
+    // SandSolver->ResetGrid();
+    // ElasticSolver->ResetGrid();
 
     t_count++;
   } // end while
@@ -296,6 +332,8 @@ int main(int argc, char **argv) {
 
   delete SnowSolver;
   delete WaterSolver;
+  delete ElasticSolver;
+  delete SandSolver;
 
   return 0;
 }

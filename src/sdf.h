@@ -41,17 +41,18 @@ public:
 
     // Polygon square;
     // square.isConvex = true;
-    // square.add(glm::vec2(146.5f, 12.f), NORMAL_VTX);
-    // square.add(glm::vec2(104.f, 49.f), NORMAL_VTX);
-    // square.add(glm::vec2(150.5f, 84.f), NORMAL_VTX);
-    // square.add(glm::vec2(200.5f, 56.f), NORMAL_VTX);
+    // square.add(glm::vec2(150.f, 10.f), NORMAL_VTX);
+    // square.add(glm::vec2(100.f, 60.f), NORMAL_VTX);
+    // square.add(glm::vec2(150.f, 110.f), NORMAL_VTX);
+    // square.add(glm::vec2(200.f, 60.f), NORMAL_VTX);
     // square.computeAabb();
-    // square.translate(glm::vec2(-100.f, 50.f));
+    // square.translate(glm::vec2(25.f, 50.f));
+    // square.scale(0.5f);
     // square.r = 0.616f;
     // square.g = 0.29f;
     // square.b = 0.663f;
     // square.v = glm::vec2(0.f, 0.f);
-    // square.omega = 1.f;
+    // square.omega = 0.f;
 
     Polygon fan;
     // vertices for sdf
@@ -110,8 +111,8 @@ public:
     fan.add(glm::vec2(55.7f, 48.6f), NORMAL_VTX); // 6
     fan.computeAabb();
     // transform
-    fan.translate(glm::vec2(40.f, 140.f));
-    fan.scale(1.5f);
+    fan.translate(glm::vec2(150.f, 70.f));
+    fan.scale(2.f);
     fan.rotate(45.f);
     // other properties
     fan.r = 0.616f;
@@ -119,6 +120,85 @@ public:
     fan.b = 0.663f;
     fan.v = glm::vec2(0.f, 0.f);
     fan.omega = 0.f;
+
+    // faucet
+    Polygon faucet;
+    faucet.isConvex = false;
+    // vertices for sdf
+    faucet.add(glm::vec2(115.5f, 161.5f), SDF_VTX); // 0
+    faucet.add(glm::vec2(140.f, 161.5f), SDF_VTX);  // 1
+    faucet.add(glm::vec2(140.f, 144.5f), SDF_VTX);  // 2
+    faucet.add(glm::vec2(187.5f, 144.5f), SDF_VTX); // 3
+    faucet.add(glm::vec2(187.5f, 126.f), SDF_VTX);  // 4
+    faucet.add(glm::vec2(170.5f, 126.f), SDF_VTX);  // 5
+    faucet.add(glm::vec2(170.5f, 116.5f), SDF_VTX); // 6
+    faucet.add(glm::vec2(178.5f, 116.5f), SDF_VTX); // 7
+    faucet.add(glm::vec2(178.5f, 109.5f), SDF_VTX); // 8
+    faucet.add(glm::vec2(152.5f, 109.5f), SDF_VTX); // 9
+    faucet.add(glm::vec2(152.5f, 116.5f), SDF_VTX); // 10
+    faucet.add(glm::vec2(160.f, 116.5f), SDF_VTX);  // 11
+    faucet.add(glm::vec2(160.f, 126.f), SDF_VTX);   // 12
+    faucet.add(glm::vec2(115.5f, 126.f), SDF_VTX);  // 13
+    // vertices for drawing
+    // triangle 1
+    faucet.add(glm::vec2(115.5f, 161.5f), NORMAL_VTX); // 0
+    faucet.add(glm::vec2(140.f, 161.5f), NORMAL_VTX);  // 1
+    faucet.add(glm::vec2(140.f, 144.5f), NORMAL_VTX);  // 2
+    // triangle 2
+    faucet.add(glm::vec2(115.5f, 161.5f), NORMAL_VTX); // 0
+    faucet.add(glm::vec2(140.f, 144.5f), NORMAL_VTX);  // 2
+    faucet.add(glm::vec2(115.5f, 126.f), NORMAL_VTX);  // 13
+    // triangle 3
+    faucet.add(glm::vec2(140.f, 144.5f), NORMAL_VTX); // 2
+    faucet.add(glm::vec2(160.f, 126.f), NORMAL_VTX);  // 12
+    faucet.add(glm::vec2(115.5f, 126.f), NORMAL_VTX); // 13
+    // triangle 4
+    faucet.add(glm::vec2(140.f, 144.5f), NORMAL_VTX);  // 2
+    faucet.add(glm::vec2(187.5f, 144.5f), NORMAL_VTX); // 3
+    faucet.add(glm::vec2(160.f, 126.f), NORMAL_VTX);   // 12
+    // triangle 5
+    faucet.add(glm::vec2(187.5f, 144.5f), NORMAL_VTX); // 3
+    faucet.add(glm::vec2(170.5f, 126.f), NORMAL_VTX);  // 5
+    faucet.add(glm::vec2(160.f, 126.f), NORMAL_VTX);   // 12
+    // triangle 6
+    faucet.add(glm::vec2(187.5f, 144.5f), NORMAL_VTX); // 3
+    faucet.add(glm::vec2(187.5f, 126.f), NORMAL_VTX);  // 4
+    faucet.add(glm::vec2(170.5f, 126.f), NORMAL_VTX);  // 5
+    // triangle 7
+    faucet.add(glm::vec2(170.5f, 126.f), NORMAL_VTX); // 5
+    faucet.add(glm::vec2(160.f, 116.5f), NORMAL_VTX); // 11
+    faucet.add(glm::vec2(160.f, 126.f), NORMAL_VTX);  // 12
+    // triangle 8
+    faucet.add(glm::vec2(170.5f, 126.f), NORMAL_VTX);  // 5
+    faucet.add(glm::vec2(170.5f, 116.5f), NORMAL_VTX); // 6
+    faucet.add(glm::vec2(160.f, 116.5f), NORMAL_VTX);  // 11
+    // triangle 9
+    faucet.add(glm::vec2(152.5f, 109.5f), NORMAL_VTX); // 9
+    faucet.add(glm::vec2(152.5f, 116.5f), NORMAL_VTX); // 10
+    faucet.add(glm::vec2(160.f, 116.5f), NORMAL_VTX);  // 11
+    // triangle 10
+    faucet.add(glm::vec2(178.5f, 109.5f), NORMAL_VTX); // 8
+    faucet.add(glm::vec2(152.5f, 109.5f), NORMAL_VTX); // 9
+    faucet.add(glm::vec2(160.f, 116.5f), NORMAL_VTX);  // 11
+    // triangle 11
+    faucet.add(glm::vec2(170.5f, 116.5f), NORMAL_VTX); // 6
+    faucet.add(glm::vec2(178.5f, 109.5f), NORMAL_VTX); // 8
+    faucet.add(glm::vec2(160.f, 116.5f), NORMAL_VTX);  // 11
+    // triangle 12
+    faucet.add(glm::vec2(170.5f, 116.5f), NORMAL_VTX); // 6
+    faucet.add(glm::vec2(178.5f, 116.5f), NORMAL_VTX); // 7
+    faucet.add(glm::vec2(178.5f, 109.5f), NORMAL_VTX); // 8
+    faucet.computeAabb();
+    // transform
+    faucet.translate(glm::vec2(-60.f, 75.f));
+    faucet.rotate(-180.f);
+    faucet.scale(0.75f);
+    // other properties
+    faucet.r = 0.616f;
+    faucet.g = 0.29f;
+    faucet.b = 0.663f;
+    faucet.v = glm::vec2(0.f, 0.f);
+    faucet.omega = 0.f;
 
     // // Knife A
     // Polygon knifeA;
@@ -185,6 +265,7 @@ public:
     // polys.push_back(square);
     polys.push_back(fan);
     // polys.push_back(knifeA);
+    polys.push_back(faucet);
 
     return polys;
   }

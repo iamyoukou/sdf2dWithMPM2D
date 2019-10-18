@@ -272,7 +272,6 @@ float Water::blue[3] = {0.3f, 0.7f, 1.0f};
 float Water::h_color = 40.0f;
 float Water::l_color = 20.0f;
 float Water::d_color = h_color - l_color;
-float Water::blood[3] = {0.78f, 0.01f, 0.01f};
 
 void Water::DrawParticle() {
   glPointSize(10);
@@ -293,9 +292,6 @@ void Water::DrawParticle() {
   } else {
     glColor3f(grey[0], grey[1], grey[2]);
   }
-  // float temp = blood[0] - t_life;
-  // float delta_b = (temp < 0.31f) ? 0.31f : temp;
-  // glColor3f(blood[1], blood[2], temp);
 
   glEnable(GL_POINT_SMOOTH); // Round particles
   glBegin(GL_POINTS);
@@ -305,7 +301,7 @@ void Water::DrawParticle() {
 
 //
 void DrySand::DrawParticle() {
-  glPointSize(12);
+  glPointSize(6);
 
   if (r <= 0.60f)
     glColor3f(0.88f, 0.66f, 0.37f);
@@ -335,8 +331,8 @@ void Snow::DrawParticle() {
 
 //
 void Elastic::DrawParticle() {
-  glPointSize(10);
-  glColor3f(r * 0.8f, g * 0.8f, b * 0.8f);
+  glPointSize(6);
+  glColor3f(r, g, b);
 
   glEnable(GL_POINT_SMOOTH);
   glBegin(GL_POINTS);
