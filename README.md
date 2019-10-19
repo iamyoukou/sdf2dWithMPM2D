@@ -5,4 +5,4 @@ The SDF algorithm is inspired by Yuanming Hu's [Taichi](https://github.com/yuanm
 And the MPM algorithm is from [Elias-Gu's MPM2D](https://github.com/Elias-Gu/MPM2D).
 
 # Result
-![result](./video/result.gif)
+![result](./video/output.gif)
