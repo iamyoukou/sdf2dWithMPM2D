@@ -159,7 +159,7 @@ public:
           Vector2f(glm::cos(rndTheta) * float(radius),
                    -glm::sin(rndTheta) * float(radius)); // Initial velocity
 
-      float rndx = float(myRand(-5, 5));
+      float rndx = float(myRand(-7, 7));
       float rndy = float(myRand(-5, 5));
       Vector2f pos = Vector2f(110.f + rndx, 187.f + rndy); // new positions
 

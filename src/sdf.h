@@ -111,7 +111,7 @@ public:
     fan.add(glm::vec2(55.7f, 48.6f), NORMAL_VTX); // 6
     fan.computeAabb();
     // transform
-    fan.translate(glm::vec2(150.f, 70.f));
+    fan.translate(glm::vec2(140.f, 70.f));
     fan.scale(2.f);
     fan.rotate(45.f);
     // other properties

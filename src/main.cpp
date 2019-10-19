@@ -19,6 +19,7 @@ int t_count = 0;
 int frameNumber = 0;
 bool mask1 = true, mask2 = true, mask3 = true; // for animation controlling
 bool startWater = false;
+bool isAddPartices = true, isMovePolygon = false;
 
 // for create new particles
 int deg = 30;
@@ -32,7 +33,7 @@ void images2video() {
   // so I just start from the third frame
   std::string command =
       "ffmpeg -r 60 -start_number 2 -i ../result/sim%04d.png -vcodec mpeg4 "
-      "-b 20M -s 600x600 ../video/result.mp4";
+      "-b 30M -s 600x600 ../video/result.mp4";
   system(command.c_str());
 
   // remove images
@@ -120,68 +121,82 @@ void Update() {
   }
 
   if (startWater) {
-    WaterSolver->MovePolygons();
-    // WaterSolver->computeSdf();
+    if (frameNumber == 31) {
+      isMovePolygon = true;
+    } else if (frameNumber == 56) {
+      isMovePolygon = false;
+      // WaterSolver->polygons[0].omega = 0.f;
+    } else if (frameNumber == 401) {
+      // isMovePolygon = true;
+    }
+
+    // just a trick to reduce rendering time
+    if (isMovePolygon) {
+      WaterSolver->MovePolygons();
+      WaterSolver->computeSdf();
+    }
+
+    // manually change parameters
+    if (frameNumber == 100) {
+      WaterSolver->dt_rob = DT_ROB * 2;
+      deg = 35;
+      radius = 35;
+      pNum = 7;
+    } else if (frameNumber == 150) {
+      WaterSolver->dt_rob = DT_ROB * 3;
+      deg = 40;
+      radius = 30;
+      pNum = 6;
+    } else if (frameNumber == 200) {
+      WaterSolver->dt_rob = DT_ROB * 4;
+      deg = 50;
+      radius = 25;
+      pNum = 5;
+    } else if (frameNumber == 250) {
+      WaterSolver->dt_rob = DT_ROB * 5;
+      deg = 60;
+      radius = 20;
+      pNum = 4;
+    } else if (frameNumber == 300) {
+      WaterSolver->dt_rob = DT_ROB * 6;
+      deg = 70;
+      radius = 15;
+      pNum = 3;
+    } else if (frameNumber == 350) {
+      WaterSolver->dt_rob = DT_ROB * 7;
+      deg = 80;
+      radius = 10;
+      pNum = 2;
+    } else if (frameNumber == 400) {
+      WaterSolver->dt_rob = DT_ROB * 8;
+      deg = 85;
+      radius = 10;
+      isAddPartices = false;
+    } else if (frameNumber == 450) {
+      WaterSolver->dt_rob = DT_ROB * 9;
+      deg = 85;
+      radius = 10;
+    } else if (frameNumber == 500) {
+      WaterSolver->dt_rob = DT_ROB * 10;
+      deg = 85;
+      radius = 10;
+    }
 
     // add water particles
     if (t_count % WaterSolver->dt_rob == 0 &&
-        WaterSolver->particles.size() < 5000) {
-
-      // manually change parameters
-      if (frameNumber == 100) {
-        WaterSolver->dt_rob = DT_ROB * 2;
-        deg = 35;
-        radius = 35;
-        pNum = 7;
-      } else if (frameNumber == 150) {
-        WaterSolver->dt_rob = DT_ROB * 3;
-        deg = 40;
-        radius = 30;
-        pNum = 6;
-      } else if (frameNumber == 200) {
-        WaterSolver->dt_rob = DT_ROB * 4;
-        deg = 50;
-        radius = 25;
-        pNum = 5;
-      } else if (frameNumber == 250) {
-        WaterSolver->dt_rob = DT_ROB * 5;
-        deg = 60;
-        radius = 20;
-        pNum = 4;
-      } else if (frameNumber == 300) {
-        WaterSolver->dt_rob = DT_ROB * 6;
-        deg = 70;
-        radius = 15;
-        pNum = 3;
-      } else if (frameNumber == 350) {
-        WaterSolver->dt_rob = DT_ROB * 7;
-        deg = 80;
-        radius = 10;
-        pNum = 2;
-      } else if (frameNumber == 400) {
-        WaterSolver->dt_rob = DT_ROB * 8;
-        deg = 85;
-        radius = 10;
-        pNum = 1;
-      } else if (frameNumber == 450) {
-        WaterSolver->dt_rob = DT_ROB * 9;
-        deg = 85;
-        radius = 10;
-      } else if (frameNumber == 500) {
-        WaterSolver->dt_rob = DT_ROB * 10;
-        deg = 85;
-        radius = 10;
-      }
+        WaterSolver->particles.size() < 6000) {
 
       // Add water particles
-      std::vector<Water> new_p = Water::AddParticles(deg, radius, pNum);
+      if (isAddPartices) {
+        std::vector<Water> new_p = Water::AddParticles(deg, radius, pNum + 4);
 
-      // Add particles to solver
-      for (size_t p = 0; p < new_p.size(); p++) {
-        WaterSolver->particles.push_back(new_p[p]);
+        // Add particles to solver
+        for (size_t p = 0; p < new_p.size(); p++) {
+          WaterSolver->particles.push_back(new_p[p]);
+        }
+
+        WaterSolver->plen = WaterSolver->particles.size();
       }
-
-      WaterSolver->plen = WaterSolver->particles.size();
     }
 
     if (WaterSolver->particles.size() > 0) {
