@@ -23,42 +23,122 @@ Solver<Type>::Solver(const std::vector<Border> &inBorders,
 |			          Functions for computing sdf
 |
 ----------------------------------------------------------------------- */
+// For each grid point, compute its sdf
+// template <typename Type> void Solver<Type>::computeSdfNaive() {
+//   // compute sdf for (sdfWidth * sdfHeight) world space points
+//   // the interval between two adjacent points is sdfCellSize
+//   for (int x = 0; x < sdfWidth; x++) {
+//     for (int y = 0; y < sdfHeight; y++) {
+//       // std::cout << x << ", " << y << '\n';
+//
+//       // world space point
+//       glm::vec2 p = worldOrigin + glm::vec2(sdfCellSize * x, sdfCellSize *
+//       y);
+//
+//       float fDist = 9999.f;
+//       float temp = 0.f;
+//
+//       // node index
+//       int idx = x + y * (sdfWidth - 1); // # of nodes in a row is (sdfWidth -
+//       1)
+//
+//       for (int i = 0; i < polygons.size(); i++) {
+//           temp = (inside_polygon(p, polygons[i])) ? -1.f : 1.f;
+//           temp *= nearest_distance(p, polygons[i]);
+//
+//           if (temp < fDist) {
+//             fDist = temp;
+//
+//             // the nearest polygon from this node
+//             nodes[idx].nearestPolygonPtr = &polygons[i];
+//           }
+//       }
+//
+//       // save sdf distance
+//       nodes[idx].sdfDist = fDist;
+//       // std::cout << "(" << x << ", " << y << ") distance = " << fDist <<
+//       '\n';
+//     }
+//   }
+// }
+
 template <typename Type> void Solver<Type>::computeSdf() {
-  // compute sdf for (sdfWidth * sdfHeight) world space points
-  // the interval between two adjacent points is sdfCellSize
+  // A simple strategy to reduce the cost of computing sdf:
+  // Compute an aabb which is a little bigger than the aabb of the polygon
+  // Compute the grid points (or nodes) occupied by this aabb
+  // Only compute sdf for these grid points
+  // For the orther, set the distance to 9999.f
+
+  // First, we need to initialize the sdf for all grid points
   for (int x = 0; x < sdfWidth; x++) {
     for (int y = 0; y < sdfHeight; y++) {
-      // std::cout << x << ", " << y << '\n';
-
-      // world space point
-      glm::vec2 p = worldOrigin + glm::vec2(sdfCellSize * x, sdfCellSize * y);
-
-      float fDist = 9999.f;
-      float temp = 0.f;
-
       // node index
       int idx = x + y * (sdfWidth - 1); // # of nodes in a row is (sdfWidth - 1)
 
-      for (int i = 0; i < polygons.size(); i++) {
-        // std::cout << i << '\n';
-        temp = (inside_polygon(p, polygons[i])) ? -1.f : 1.f;
-        temp *= nearest_distance(p, polygons[i]);
-        // std::cout << "here" << '\n';
+      nodes[idx].sdfDist = 9999.f;
+    }
+  }
 
-        // fDist = glm::min(temp, fDist);
+  // Then, iterate all the polygons,
+  // to find the necessary region in which we need to compute sdf
+  for (int i = 0; i < polygons.size(); i++) {
+    Polygon &poly = polygons[i];
+
+    // start and end world position of the region
+    glm::vec2 startWorld(poly.lb.x, poly.lb.y);
+    glm::vec2 endWorld(poly.rt.x, poly.rt.y);
+
+    // world position to grid points
+    glm::ivec2 startGrid = world2Grid(startWorld);
+    glm::ivec2 endGrid = world2Grid(endWorld);
+
+    // extend the region a little bit
+    int alpha = 2;
+    startGrid.x -= alpha;
+    startGrid.y -= alpha;
+    endGrid.x += alpha;
+    endGrid.y += alpha;
+
+    // restrict the region
+    startGrid.x = (startGrid.x < 0) ? 0 : startGrid.x;
+    startGrid.y = (startGrid.y < 0) ? 0 : startGrid.y;
+    endGrid.x = (endGrid.x > X_GRID - 1) ? X_GRID - 1 : endGrid.x;
+    endGrid.y = (endGrid.x > Y_GRID - 1) ? Y_GRID - 1 : endGrid.y;
+
+    // compute the sdf for the necessary region
+    // compute sdf for (sdfWidth * sdfHeight) world space points
+    // the interval between two adjacent points is sdfCellSize
+    for (int x = startGrid.x; x < endGrid.x; x++) {
+      for (int y = startGrid.y; y < endGrid.y; y++) {
+        // std::cout << x << ", " << y << '\n';
+
+        // world space point
+        glm::vec2 p = worldOrigin + glm::vec2(sdfCellSize * x, sdfCellSize * y);
+
+        float fDist = getDistance(p);
+        float temp = 0.f;
+
+        // node index
+        // # of nodes in a row is (sdfWidth - 1)
+        int idx = x + y * (sdfWidth - 1);
+
+        temp = (inside_polygon(p, poly)) ? -1.f : 1.f;
+        temp *= nearest_distance(p, poly);
+
         if (temp < fDist) {
           fDist = temp;
 
           // the nearest polygon from this node
-          nodes[idx].nearestPolygonPtr = &polygons[i];
+          nodes[idx].nearestPolygonPtr = &poly;
         }
-      }
 
-      // save sdf distance
-      nodes[idx].sdfDist = fDist;
-      // std::cout << "(" << x << ", " << y << ") distance = " << fDist << '\n';
+        // save sdf distance
+        nodes[idx].sdfDist = fDist;
+        // std::cout << "(" << x << ", " << y << ") distance = " << fDist <<
+        // '\n';
+      }
     }
-  }
+  } // end iterate all polygons
 }
 
 template <typename Type>
@@ -126,17 +206,18 @@ float Solver<Type>::nearest_distance(glm::vec2 p, Polygon &poly) {
 template <typename Type> float Solver<Type>::getDistance(glm::vec2 p) {
 
   // world position to sdf index
-  int idx_x, idx_y;
-  idx_x = int(glm::floor(p.x / sdfCellSize));
-  idx_y = int(glm::floor(p.y / sdfCellSize));
+  glm::ivec2 gridPos = world2Grid(p);
+  // int idx_x, idx_y;
+  // idx_x = int(glm::floor(p.x / sdfCellSize));
+  // idx_y = int(glm::floor(p.y / sdfCellSize));
 
-  if (idx_x < 0 || idx_x > sdfWidth - 1) {
+  if (gridPos.x < 0 || gridPos.x > sdfWidth - 1) {
     return 9999.f;
-  } else if (idx_y < 0.f || idx_y > sdfHeight - 1) {
+  } else if (gridPos.y < 0.f || gridPos.y > sdfHeight - 1) {
     return 9999.f;
   } else {
-    int idx = idx_x + idx_y * (sdfWidth - 1);
-    // std::cout << idx << '\n';
+    int idx = gridPos.x + gridPos.y * (sdfWidth - 1);
+    // std::cout << gridPos << '\n';
     return nodes[idx].sdfDist;
   }
 }
@@ -174,21 +255,24 @@ template <typename Type> glm::vec2 Solver<Type>::getGradient(glm::vec2 p) {
 // p is world position
 template <typename Type> Polygon *Solver<Type>::getPolygon(glm::vec2 p) {
   // world position to sdf index
-  int idx_x, idx_y;
-  idx_x = int(glm::floor(p.x / sdfCellSize));
-  idx_y = int(glm::floor(p.y / sdfCellSize));
+  glm::ivec2 gridPos = world2Grid(p);
+  // int idx_x, idx_y;
+  // idx_x = int(glm::floor(p.x / sdfCellSize));
+  // idx_y = int(glm::floor(p.y / sdfCellSize));
 
-  if (idx_x < 0 || idx_x > sdfWidth - 1) {
+  if (gridPos.x < 0 || gridPos.x > sdfWidth - 1) {
     return NULL;
-  } else if (idx_y < 0.f || idx_y > sdfHeight - 1) {
+  } else if (gridPos.y < 0.f || gridPos.y > sdfHeight - 1) {
     return NULL;
   } else {
-    int idx = idx_x + idx_y * (sdfWidth - 1);
+    int idx = gridPos.x + gridPos.y * (sdfWidth - 1);
     return nodes[idx].nearestPolygonPtr;
   }
 }
 
-template <typename Type> void Solver<Type>::applySdfCollision(Type &p) {
+// if collision happens, return true
+// otherwise, return false
+template <typename Type> bool Solver<Type>::applySdfCollision(Type &p) {
   // particle world space position
   glm::vec2 pos(p.Xp[0], p.Xp[1]);
   glm::vec2 v(p.Vp[0], p.Vp[1]);
@@ -203,10 +287,6 @@ template <typename Type> void Solver<Type>::applySdfCollision(Type &p) {
 
   glm::vec2 vco(0.f, 0.f);
 
-  // 基于 sdf 的碰撞检测
-  // 和边界处的碰撞检测
-  // 唯一不同的是法向量 n 的计算方式
-  // 而碰撞后的速度，采用同样��处理
   // for sdf collision detection
   // narrow band threshold
   if (glm::abs(dist) < NARROW_BAND) {
@@ -293,6 +373,8 @@ template <typename Type> void Solver<Type>::applySdfCollision(Type &p) {
       //           << '\n';
     }
   }
+
+  return isCollisionOn;
 }
 
 /* -----------------------------------------------------------------------

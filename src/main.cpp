@@ -124,7 +124,7 @@ void Update() {
     if (frameNumber == 31) {
       isMovePolygon = true;
     } else if (frameNumber == 56) {
-      isMovePolygon = false;
+      // isMovePolygon = false;
       // WaterSolver->polygons[0].omega = 0.f;
     } else if (frameNumber == 401) {
       // isMovePolygon = true;
@@ -292,9 +292,7 @@ int main(int argc, char **argv) {
       // if (frameNumber == 81)
       // if (WaterSolver->particles.size() > 0)
       WaterSolver->Draw();
-
       // SandSolver->Draw();
-
       // ElasticSolver->Draw();
 
       // for testing sdf
@@ -409,9 +407,11 @@ void drawSdf(GLFWwindow *wnd) {
   // for test
   // draw sdf gradient at a given point
   glm::vec2 start = glm::vec2(wx, wy);
-  float dist = SnowSolver->getDistance(start);
-  glm::vec2 grad = SnowSolver->getGradient(start);
+  float dist = WaterSolver->getDistance(start);
+  glm::vec2 grad = WaterSolver->getGradient(start);
   glm::vec2 end = start + dist * grad;
+
+  // std::cout << "dist = " << dist << '\n';
 
   glLineWidth(4);
   glColor3f(1.f, 0.f, 0.f);

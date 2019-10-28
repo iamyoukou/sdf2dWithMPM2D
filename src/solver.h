@@ -47,11 +47,20 @@ public:
   float getDistance(glm::vec2);
   glm::vec2 getGradient(glm::vec2);
   Polygon *getPolygon(glm::vec2);
-  void applySdfCollision(Type &);
+  bool applySdfCollision(Type &);
 
   void Draw(); // Draw particles, border and nodes (if selected)
   void WriteToFile(
       int frame); // Write point cloud coordinates to .ply file (Houdini)
+
+  static glm::ivec2 world2Grid(glm::vec2 worldPos) {
+    glm::ivec2 gridPos;
+
+    gridPos.x = int(glm::floor(worldPos.x / sdfCellSize));
+    gridPos.y = int(glm::floor(worldPos.y / sdfCellSize));
+
+    return gridPos;
+  }
 
 /* Static functions */
 #if INTERPOLATION == 1
