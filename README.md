@@ -3,25 +3,52 @@ I integrate an SDF-based collision detection into an MPM simulator.
 
 The SDF algorithm is inspired by [Yuanming Hu's Taichi](https://github.com/yuanming-hu/taichi).
 
-And the MPM algorithm is from [Elias-Gu's MPM2D](https://github.com/Elias-Gu/MPM2D).
+The MPM algorithm is from [Elias-Gu's MPM2D](https://github.com/Elias-Gu/MPM2D).
 
 # About the computation of SDF
-The original method used to compute SDF is too expensive, because it iterates all the grid points.
-It takes more than `60s` to render a frame in the demo.
+![comparison](./image/comparison.png)
 
-I wrote an refined version which only iterates some area around a polygon.
-This area is a little bigger than the AABB of the polygon.
-Now it only takes `8~9s` to render a frame. 
+The original method (Fig.1a) I use to compute SDF is too expensive,
+because it iterates all the grid points.
+For example, in the demo, it takes more than `60s` to render a frame.
 
-Another way to reduce the computation may be the one from [Fuhrmann,2003](https://pdfs.semanticscholar.org/ec41/48aed023dfe1ba6f42a198613800fe29ae37.pdf).
-Instead of the AABB of the whole polygon,
-they compute SDF for AABBs of all the triangle faces of the polygon.
-But I didn't try it yet.
+However, only grid points inside the narrow-band of the polygon are necessary.
+So first, I select an area (the green box in Fig.1b) that is a little bigger than the AABB (the blue box in Fig.1b) of the polygon.
+Then, I iterate grid points inside this area.
+Now it only takes `8~9s` to render a frame in the demo.
+
+In fact, my method is inspired by [\[Fuhrmann,2003\]](https://pdfs.semanticscholar.org/ec41/48aed023dfe1ba6f42a198613800fe29ae37.pdf) (Fig.1c).
+Although their method is for 3D case, it can be applied in 2D.
+For an edge, they first displace it a little along with its normal direction to make a small box (the blue box in Fig.1c).
+Then, they compute the AABB (the breen box in Fig.1c) of this box.
+Finally, they iterate grid points inside this AABB.
+The same procedure is applied to all the edges of the polygon.
+(I didn't implement this method yet)
+
+## Which one to use?
+![concave_convex](./image/concave_convex.png)
 
 From my point of view,
-if the inner part of a polygon occpies a lot of area,
-Fuhrmann's method is better than the one I wrote.
-Otherwise, such as the one I used in the demo, mine is better.
+if the polygon is convex (Fig.2a),
+then Fuhrmann's method is the best.
+Otherwise, if the polygon is concave (Fig.2b), my method is the best.
+
+For a convex polygon, a large part of grid points occupied by its inner area are redundant.
+Fuhrmann's method avoids them to some extent.
+In contrast, my method iterates all those grid points.
+However, for a concave polygon (Fig.2b),
+the number of overlapped grid points caused by Fuhrmann's method is remarkable.
+On the orther hand, my method does not produce overlapped grid points.
+
+In addition, my method only requires vertex positions.
+But Fuhrmann's method also requires edges and their normals.
+
+# Another method I considered
+![another](./image/another.png)
+
 
 # Result
 ![result](./video/output.gif)
+
+# Reference
+\[Fuhrmann,2003\] Fuhrmann, Arnulph, Gerrit Sobotka, and Clemens Groß. "Distance fields for rapid collision detection in physically based modeling." Proceedings of GraphiCon 2003. 2003.
