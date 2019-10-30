@@ -1,9 +1,9 @@
 # SDF-based collision detection with MPM2D
 I integrate an SDF-based collision detection into an MPM simulator.
 
-The SDF algorithm is inspired by [Yuanming Hu's Taichi](https://github.com/yuanming-hu/taichi).
-
-The MPM algorithm is from [Elias-Gu's MPM2D](https://github.com/Elias-Gu/MPM2D).
+SDF is short for Signed Distance Field,
+and MPM is short for Material Point Method.
+The SDF algorithm is inspired by [Yuanming Hu's Taichi](https://github.com/yuanming-hu/taichi), and the MPM algorithm is from [Elias-Gu's MPM2D](https://github.com/Elias-Gu/MPM2D).
 
 # About the computation of SDF
 ![comparison](./image/comparison.png)
