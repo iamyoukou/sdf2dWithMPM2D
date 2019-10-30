@@ -43,9 +43,6 @@ On the orther hand, my method does not produce overlapped grid points.
 In addition, my method only requires vertex positions.
 But Fuhrmann's method also requires edges and their normals.
 
-# Another method I considered
-![another](./image/another.png)
-
 
 # Result
 ![result](./video/output.gif)
