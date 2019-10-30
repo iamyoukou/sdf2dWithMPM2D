@@ -8,22 +8,21 @@ The MPM algorithm is from [Elias-Gu's MPM2D](https://github.com/Elias-Gu/MPM2D).
 # About the computation of SDF
 ![comparison](./image/comparison.png)
 
-The original method (Fig.1a) I use to compute SDF is too expensive,
+The original method (Fig.1a) that I use to compute SDF is too expensive,
 because it iterates all the grid points.
 For example, in the demo, it takes more than `60s` to render a frame.
 
 However, only grid points inside the narrow-band of the polygon are necessary.
-So first, I select an area (the green box in Fig.1b) that is a little bigger than the AABB (the blue box in Fig.1b) of the polygon.
+So to reduce the unnecessary computation,
+I first select an area (the green box in Fig.1b) that is a little bigger than the AABB (the blue box in Fig.1b) of the polygon.
 Then, I iterate grid points inside this area.
 Now it only takes `8~9s` to render a frame in the demo.
 
 In fact, my method is inspired by [\[Fuhrmann,2003\]](https://pdfs.semanticscholar.org/ec41/48aed023dfe1ba6f42a198613800fe29ae37.pdf) (Fig.1c).
 Although their method is for 3D case, it can be applied in 2D.
-For an edge, they first displace it a little along with its normal direction to make a small box (the blue box in Fig.1c).
-Then, they compute the AABB (the breen box in Fig.1c) of this box.
-Finally, they iterate grid points inside this AABB.
-The same procedure is applied to all the edges of the polygon.
-(I didn't implement this method yet)
+For each edge, first, displace it a little along with its normal direction and the opposite direction to make a small box (the blue box in Fig.1c).
+Then, compute the AABB (the breen box in Fig.1c) of this box.
+Finally, iterate grid points inside this AABB. (I didn't implement this method yet)
 
 ## Which one to use?
 ![concave_convex](./image/concave_convex.png)
