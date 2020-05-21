@@ -301,7 +301,7 @@ int main(int argc, char **argv) {
       glfwSwapBuffers(window);
 
 #if RECORD_VIDEO
-      std::string dir = "../result/sim";
+      std::string dir = "./result/sim";
 
       // zero padding
       std::string num = std::to_string(frameNumber);
