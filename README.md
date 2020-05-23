@@ -6,7 +6,7 @@ and MPM is short for Material Point Method.
 The SDF algorithm is inspired by [Yuanming Hu's Taichi](https://github.com/yuanming-hu/taichi), and the MPM algorithm is from [Elias-Gu's MPM2D](https://github.com/Elias-Gu/MPM2D).
 
 # About the computation of SDF
-![comparison](./image/comparison.png)
+![comparison](./res/comparison.png)
 
 The original method (Fig.1a) that I use to compute SDF is too expensive,
 because it iterates all the grid points.
@@ -25,7 +25,7 @@ Then, compute the AABB (the breen box in Fig.1c) of this box.
 Finally, iterate grid points inside this AABB. (I didn't implement this method yet)
 
 ## Which one to use?
-![concave_convex](./image/concave_convex.png)
+![concave_convex](./res/concave_convex.png)
 
 From my point of view,
 if the polygon is convex (Fig.2a),
