@@ -1,9 +1,7 @@
 #pragma once
 
 #include "algebra.h"
-#include <glm/glm.hpp>
-#include <glm/gtx/compatibility.hpp>
-#include <glm/gtx/string_cast.hpp>
+#include "common.h"
 
 /* -----------------------------------------------------------------------
 |									OPTIONS

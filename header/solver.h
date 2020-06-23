@@ -4,10 +4,7 @@
 #include "particle.h"
 #include "constants.h"
 #include "sdf.h"
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <iomanip>
+#include "common.h"
 
 /* The solver class is the link between particles and nodes.
 Transfers and updates are executed on solver instances. */

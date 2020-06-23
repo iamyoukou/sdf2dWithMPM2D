@@ -1,8 +1,6 @@
 #pragma once
 
-#include <algorithm>
-#include <cmath>
-#include <iostream>
+#include "common.h"
 
 /* Vector and Matrix classes. */
 #pragma region "Vector2f"

@@ -10,11 +10,11 @@
 /* Declarations */
 void initGLContext();
 GLFWwindow *initGLFWContext();
-void drawSdf(GLFWwindow *);
-Solver<Snow> *SnowSolver;
+// void drawSdf(GLFWwindow *);
+// Solver<Snow> *SnowSolver;
 Solver<Water> *WaterSolver;
-Solver<DrySand> *SandSolver;
-Solver<Elastic> *ElasticSolver;
+// Solver<DrySand> *SandSolver;
+// Solver<Elastic> *ElasticSolver;
 int t_count = 0;
 int frameNumber = 0;
 bool mask1 = true, mask2 = true, mask3 = true; // for animation controlling
@@ -25,21 +25,6 @@ bool isAddPartices = true, isMovePolygon = false;
 int deg = 30;
 int radius = 40;
 int pNum = 8;
-
-/* For video */
-void images2video() {
-  // the first 2 frames are always broken
-  // don't know why
-  // so I just start from the third frame
-  std::string command =
-      "ffmpeg -r 60 -start_number 2 -i ../result/sim%04d.png -vcodec mpeg4 "
-      "-b 30M -s 600x600 ../video/result.mp4";
-  system(command.c_str());
-
-  // remove images
-  // command = "rm ./result/*.png";
-  // system(command.c_str());
-}
 
 /* -----------------------------------------------------------------------
 |					MATERIAL POINT METHOD ALGORITHM
@@ -251,20 +236,6 @@ int main(int argc, char **argv) {
   /* Initialize SnowSolver */
   Initialization();
 
-/* [1] : output data to .ply file (to read in Houdini for example) */
-#if WRITE_TO_FILE
-  int frame_count = 0;
-  while (1) {
-    AddParticles();
-    Update();
-    if (t_count % (int)(DT_render / DT) == 0) // Record frame at desired
-      rate SnowSolver->WriteToFile(frame_count++);
-    SnowSolver->ResetGrid();
-    t_count++;
-  }
-
-#else
-  /* [2] : show result on OpenGL window, and record an .mp4 if selected */
   const int frameLimit = 500;
 
   GLFWwindow *window = initGLFWContext();
@@ -336,17 +307,12 @@ int main(int argc, char **argv) {
     t_count++;
   } // end while
 
-#if RECORD_VIDEO
-  images2video();
-#endif
-
   glfwTerminate();
-#endif
 
-  delete SnowSolver;
+  // delete SnowSolver;
   delete WaterSolver;
-  delete ElasticSolver;
-  delete SandSolver;
+  // delete ElasticSolver;
+  // delete SandSolver;
 
   return 0;
 }
@@ -391,33 +357,33 @@ void initGLContext() {
 }
 
 // for testing sdf
-void drawSdf(GLFWwindow *wnd) {
-  double xpos, ypos;
-  glfwGetCursorPos(wnd, &xpos, &ypos);
-
-  float fx, fy;
-  fx = xpos / (float)X_WINDOW;
-  fy = ypos / (float)Y_WINDOW;
-
-  // Note: (0, 0) is at right-bottom
-  float wx, wy;
-  wx = fx * X_GRID;
-  wy = (1.f - fy) * Y_GRID;
-
-  // for test
-  // draw sdf gradient at a given point
-  glm::vec2 start = glm::vec2(wx, wy);
-  float dist = WaterSolver->getDistance(start);
-  glm::vec2 grad = WaterSolver->getGradient(start);
-  glm::vec2 end = start + dist * grad;
-
-  // std::cout << "dist = " << dist << '\n';
-
-  glLineWidth(4);
-  glColor3f(1.f, 0.f, 0.f);
-
-  glBegin(GL_LINES);
-  glVertex2f(start.x, start.y); // start point
-  glVertex2f(end.x, end.y);     // end point
-  glEnd();
-}
+// void drawSdf(GLFWwindow *wnd) {
+//   double xpos, ypos;
+//   glfwGetCursorPos(wnd, &xpos, &ypos);
+//
+//   float fx, fy;
+//   fx = xpos / (float)X_WINDOW;
+//   fy = ypos / (float)Y_WINDOW;
+//
+//   // Note: (0, 0) is at right-bottom
+//   float wx, wy;
+//   wx = fx * X_GRID;
+//   wy = (1.f - fy) * Y_GRID;
+//
+//   // for test
+//   // draw sdf gradient at a given point
+//   glm::vec2 start = glm::vec2(wx, wy);
+//   float dist = WaterSolver->getDistance(start);
+//   glm::vec2 grad = WaterSolver->getGradient(start);
+//   glm::vec2 end = start + dist * grad;
+//
+//   // std::cout << "dist = " << dist << '\n';
+//
+//   glLineWidth(4);
+//   glColor3f(1.f, 0.f, 0.f);
+//
+//   glBegin(GL_LINES);
+//   glVertex2f(start.x, start.y); // start point
+//   glVertex2f(end.x, end.y);     // end point
+//   glEnd();
+// }

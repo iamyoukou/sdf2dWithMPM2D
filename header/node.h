@@ -3,7 +3,7 @@
 #include "constants.h"
 #include "border.h"
 #include "sdf.h"
-#include <iostream>
+#include "common.h"
 
 /* The node class defines the background grid. */
 

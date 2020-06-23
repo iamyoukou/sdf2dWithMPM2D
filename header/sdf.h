@@ -2,13 +2,7 @@
 
 #include "algebra.h"
 #include "constants.h"
-#include <vector>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc.hpp>
-#include <glm/glm.hpp>
-#include <glm/gtx/compatibility.hpp>
-#include <glm/gtx/string_cast.hpp>
+#include "common.h"
 
 class Polygon {
 public:

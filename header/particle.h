@@ -1,17 +1,7 @@
 #pragma once
 
 #include "constants.h"
-#include "PoissonGenerator.h"
-#include <math.h>
-#include <vector>
-#include <GLFW/glfw3.h>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc.hpp>
-#include <glm/glm.hpp>
-#include <glm/gtx/compatibility.hpp>
-#include <glm/gtx/string_cast.hpp>
-#include <glm/gtx/rotate_vector.hpp>
+#include "common.h"
 
 /* The particle class contains data commun to all simulation.
 The material subclasses contains particular data and methods. */
