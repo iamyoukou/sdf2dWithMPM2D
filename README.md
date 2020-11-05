@@ -1,11 +1,15 @@
 # SDF-based collision detection with MPM2D
+
 I integrate an SDF-based collision detection into an MPM simulator.
 
 SDF is short for Signed Distance Field,
 and MPM is short for Material Point Method.
 The SDF algorithm is inspired by [Yuanming Hu's Taichi](https://github.com/yuanming-hu/taichi), and the MPM algorithm is from [Elias-Gu's MPM2D](https://github.com/Elias-Gu/MPM2D).
 
+![result](./video/output.gif)
+
 # About the computation of SDF
+
 ![comparison](./res/comparison.png)
 
 The original method (Fig.1a) that I use to compute SDF is too expensive,
@@ -25,6 +29,7 @@ Then, compute the AABB (the breen box in Fig.1c) of this box.
 Finally, iterate grid points inside this AABB. (I didn't implement this method yet)
 
 ## Which one to use?
+
 ![concave_convex](./res/concave_convex.png)
 
 From my point of view,
@@ -42,9 +47,6 @@ On the orther hand, my method does not produce overlapped grid points.
 In addition, my method only requires vertex positions.
 But Fuhrmann's method also requires edges and their normals.
 
-
-# Result
-![result](./video/output.gif)
-
 # Reference
-\[Fuhrmann,2003\] Fuhrmann, Arnulph, Gerrit Sobotka, and Clemens Groß. "Distance fields for rapid collision detection in physically based modeling." Proceedings of GraphiCon 2003. 2003.
+
+\[Fuhrmann,2003] Fuhrmann, Arnulph, Gerrit Sobotka, and Clemens Groß. "Distance fields for rapid collision detection in physically based modeling." Proceedings of GraphiCon 2003. 2003.
